@@ -12,43 +12,42 @@ $result = $conn->query("SELECT * FROM pedido");
 <head>
     <meta charset="UTF-8">
     <title>Pedidos - Cali Burger</title>
-    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="icon" href="imagens/logo_cali_ico.png" type="image/png">
+    <link rel="icon" href="imagens/logo_cali_ico.ico" type="image/x-icon" />
 </head>
 <body>
-<header>
-    <h1>🍔 Cali Burger - Pedidos</h1>
-</header>
 
-<nav>
-    <a href="main.php">Início</a>
-    <a href="pedidos.php">Pedidos</a>
-    <a href="cardapio.php">Cardápio</a>
-    <a href="estoque.php">Estoque</a>
-    <a href="sair.php" class="logout">Sair</a>
-</nav>
+<?php include 'menu.php'; ?>
 
 <div class="container">
-    <h2>Pedidos Realizados</h2>
-    <table>
-        <tr>
-            <th>Nº Pedido</th>
-            <th>Produto</th>
-            <th>Valor (R$)</th>
-            <th>Cliente</th>
-            <th>Aceito</th>
-            <th>Observação</th>
-        </tr>
-        <?php while($row = $result->fetch_assoc()): ?>
+    <h2>🍔 Pedidos Realizados</h2>
+    <table class="styled-table">
+        <thead>
             <tr>
-                <td><?= $row['numero_do_pedido'] ?></td>
-                <td><?= $row['produto'] ?></td>
-                <td><?= number_format($row['valor'], 2, ',', '.') ?></td>
-                <td><?= $row['nome_cliente'] ?></td>
-                <td><?= $row['aceito'] ? 'Sim' : 'Não' ?></td>
-                <td><?= $row['observacao'] ?></td>
+                <th>Nº Pedido</th>
+                <th>Produto</th>
+                <th>Valor (R$)</th>
+                <th>Cliente</th>
+                <th>Aceito</th>
+                <th>Observação</th>
             </tr>
-        <?php endwhile; ?>
+        </thead>
+        <tbody>
+            <?php while($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['numero_do_pedido'] ?></td>
+                    <td><?= $row['produto'] ?></td>
+                    <td><?= number_format($row['valor'], 2, ',', '.') ?></td>
+                    <td><?= $row['nome_cliente'] ?></td>
+                    <td><?= $row['aceito'] ? 'Sim' : 'Não' ?></td>
+                    <td><?= $row['observacao'] ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
     </table>
 </div>
+
 </body>
 </html>

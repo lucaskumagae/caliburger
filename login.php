@@ -13,6 +13,7 @@ if (isset($_SESSION['nome'])) {
   <title>Tela de Login - Cali Burger</title>
   <link rel="stylesheet" href="login.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <link rel="icon" href="imagens/logo_cali_ico.ico" type="image/x-icon" />
 </head>
 <body>
 

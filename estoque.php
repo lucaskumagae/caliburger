@@ -12,36 +12,46 @@ $result = $conn->query("SELECT * FROM estoque");
 <head>
     <meta charset="UTF-8">
     <title>Estoque - Cali Burger</title>
-    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
-<header>
-    <h1>🍔 Cali Burger - Estoque</h1>
-</header>
 
-<nav>
-    <a href="main.php">Início</a>
-    <a href="pedidos.php">Pedidos</a>
-    <a href="cardapio.php">Cardápio</a>
-    <a href="estoque.php">Estoque</a>
-    <a href="sair.php" class="logout">Sair</a>
-</nav>
+<?php include 'menu.php'; ?>
 
 <div class="container">
-    <h2>Ingredientes em Estoque</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Ingrediente</th>
-            <th>Quantidade</th>
-        </tr>
-        <?php while($row = $result->fetch_assoc()): ?>
+    <h2>🧾 Ingredientes em Estoque</h2>
+
+    <!-- Formulário para adicionar ingrediente -->
+    <form action="adiciona_ingrediente.php" method="POST" class="form-inline">
+        <input type="text" name="nome_ingrediente" placeholder="Ingrediente" required>
+        <input type="number" name="quantidade" placeholder="Quantidade" required min="1">
+        <button type="submit">Adicionar Ingrediente</button>
+    </form>
+
+    <table class="styled-table">
+        <thead>
             <tr>
-                <td><?= $row['id_ingrediente'] ?></td>
-                <td><?= $row['nome_ingrediente'] ?></td>
-                <td><?= $row['quantidade'] ?></td>
+                <th>ID</th>
+                <th>Ingrediente</th>
+                <th>Quantidade</th>
+                <th>Ação</th>
             </tr>
-        <?php endwhile; ?>
+        </thead>
+        <tbody>
+            <?php while($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['id_ingrediente'] ?></td>
+                    <td><?= $row['nome_ingrediente'] ?></td>
+                    <td><?= $row['quantidade'] ?></td>
+                    <td>
+                        <form action="deleta_ingrediente.php" method="POST" onsubmit="return confirm('Deseja excluir este ingrediente?');">
+                            <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
+                            <button type="submit">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
     </table>
 </div>
 </body>

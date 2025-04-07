@@ -12,37 +12,36 @@ $result = $conn->query("SELECT * FROM cardapio");
 <head>
     <meta charset="UTF-8">
     <title>Cardápio - Cali Burger</title>
-    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="icon" href="imagens/logo_cali_ico.png" type="image/png">
+    <link rel="icon" href="imagens/logo_cali_ico.ico" type="image/x-icon" />
 </head>
 <body>
-<header>
-    <h1>🍔 Cali Burger - Cardápio</h1>
-</header>
 
-<nav>
-    <a href="main.php">Início</a>
-    <a href="pedidos.php">Pedidos</a>
-    <a href="cardapio.php">Cardápio</a>
-    <a href="estoque.php">Estoque</a>
-    <a href="sair.php" class="logout">Sair</a>
-</nav>
+<?php include 'menu.php'; ?>
 
 <div class="container">
-    <h2>Itens do Cardápio</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Descrição</th>
-        </tr>
-        <?php while($row = $result->fetch_assoc()): ?>
+    <h2>🍟 Itens do Cardápio</h2>
+    <table class="styled-table">
+        <thead>
             <tr>
-                <td><?= $row['id'] ?></td>
-                <td><?= $row['nome'] ?></td>
-                <td><?= $row['descricao'] ?></td>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
             </tr>
-        <?php endwhile; ?>
+        </thead>
+        <tbody>
+            <?php while($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['id'] ?></td>
+                    <td><?= $row['nome'] ?></td>
+                    <td><?= $row['descricao'] ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
     </table>
 </div>
+
 </body>
 </html>

@@ -1,0 +1,145 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body, html {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9f9f9;
+    height: 100%;
+    color: #333;
+  }
+  
+  header {
+    background-color: #c0392b;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .logo-area img {
+    height: 60px;
+    width: auto;
+  }
+  
+  .logo-area h1 {
+    font-size: 1.8em;
+  }
+  
+  nav {
+    background-color: #e74c3c;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  nav a:hover {
+    background-color: #c0392b;
+  }
+  
+  nav .logout {
+    background-color: #ffffff22;
+    border: 1px solid white;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: 50px auto;
+    text-align: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  }
+  
+  .container h2 {
+    font-size: 2em;
+    color: #c0392b;
+    margin-bottom: 10px;
+  }
+  
+  .container p {
+    font-size: 1.1em;
+    color: #555;
+  }
+  
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .styled-table th,
+  .styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .styled-table th {
+    background-color: #c0392b;
+    color: white;
+    font-weight: 600;
+  }
+  
+  .styled-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .styled-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Formulário de adicionar ingrediente */
+  .form-inline {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 30px 0;
+  }
+  
+  .form-inline input[type="text"],
+  .form-inline input[type="number"] {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Botões (adicionar e excluir) */
+  button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #a93226;
+  }
+  
