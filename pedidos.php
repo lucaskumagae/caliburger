@@ -13,9 +13,6 @@ $result = $conn->query("SELECT * FROM pedido");
     <meta charset="UTF-8">
     <title>Pedidos - Cali Burger</title>
     <link rel="stylesheet" href="main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-    <link rel="icon" href="imagens/logo_cali_ico.png" type="image/png">
-    <link rel="icon" href="imagens/logo_cali_ico.ico" type="image/x-icon" />
 </head>
 <body>
 

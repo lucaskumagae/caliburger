@@ -5,7 +5,26 @@ if (!isset($_SESSION['nome'])) {
     exit();
 }
 include 'conexao.php';
-$result = $conn->query("SELECT * FROM cardapio");
+
+$zero_ingredients = [];
+$zero_result = $conn->query("SELECT nome_ingrediente FROM estoque WHERE quantidade = 0");
+while ($row = $zero_result->fetch_assoc()) {
+    $zero_ingredients[] = $row['nome_ingrediente'];
+}
+
+if (count($zero_ingredients) > 0) {
+    $conditions = [];
+    foreach ($zero_ingredients as $ingredient) {
+        $escaped_ingredient = $conn->real_escape_string($ingredient);
+        $conditions[] = "descricao NOT LIKE '%$escaped_ingredient%'";
+    }
+    $where_clause = implode(' AND ', $conditions);
+    $sql = "SELECT * FROM cardapio WHERE $where_clause";
+} else {
+    $sql = "SELECT * FROM cardapio";
+}
+
+$result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">

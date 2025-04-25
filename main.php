@@ -6,7 +6,6 @@ if (!isset($_SESSION['nome'])) {
 }
 include 'conexao.php';
 
-// Pede todos os campos da tabela cliente
 $usuarios = $conn->query("SELECT * FROM cliente");
 ?>
 

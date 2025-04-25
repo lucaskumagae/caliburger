@@ -18,10 +18,20 @@ $result = $conn->query("SELECT * FROM estoque");
 
 <?php include 'menu.php'; ?>
 
+<?php
+if (isset($_SESSION['msg_success'])) {
+    echo '<p class="success-message">' . $_SESSION['msg_success'] . '</p>';
+    unset($_SESSION['msg_success']);
+}
+if (isset($_SESSION['msg_error'])) {
+    echo '<p class="error-message">' . $_SESSION['msg_error'] . '</p>';
+    unset($_SESSION['msg_error']);
+}
+?>
+
 <div class="container">
     <h2>🧾 Ingredientes em Estoque</h2>
 
-    <!-- Formulário para adicionar ingrediente -->
     <form action="adiciona_ingrediente.php" method="POST" class="form-inline">
         <input type="text" name="nome_ingrediente" placeholder="Ingrediente" required>
         <input type="number" name="quantidade" placeholder="Quantidade" required min="1">
