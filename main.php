@@ -8,7 +8,6 @@ include 'conexao.php';
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate required fields
     $required_fields = ['login', 'email', 'cpf', 'data_nasc', 'end_estado', 'end_cidade', 'end_bairro', 'end_logradouro', 'senha'];
     $missing_fields = false;
     foreach ($required_fields as $field) {
@@ -21,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($missing_fields) {
         $message = '<p style="color:red;">Por favor, preencha todos os campos obrigatórios.</p>';
     } else {
-        // Prepare and bind parameters for insertion
         $login = $_POST['login'];
         $email = $_POST['email'];
         $cpf = $_POST['cpf'];
@@ -43,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pede todos os campos da tabela cliente
 $usuarios = $conn->query("SELECT * FROM cliente");
 ?>
 
