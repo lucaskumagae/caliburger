@@ -41,7 +41,7 @@ if (isset($_SESSION['nome'])) {
           }
           ?>
 
-          <p>Não tem uma conta? <a href="cadastro.php">Cadastre-se</a></p>
+          <p>Não tem uma conta? <a href="#">Cadastre-se</a></p>
         </form>
       </div>
     </div>
