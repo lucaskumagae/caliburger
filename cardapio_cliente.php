@@ -65,7 +65,9 @@ $result = mysqli_query($conn, $query);
         }
         ?>
 
-        <button type="submit">Adicionar</button>
+        <div style="text-align: right; margin-top: 10px;">
+            <button type="submit">Adicionar</button>
+        </div>
         </form>
     </main>
 </body>
