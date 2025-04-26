@@ -6,6 +6,43 @@ if (!isset($_SESSION['nome'])) {
 }
 include 'conexao.php';
 
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validate required fields
+    $required_fields = ['login', 'email', 'cpf', 'data_nasc', 'end_estado', 'end_cidade', 'end_bairro', 'end_logradouro', 'senha'];
+    $missing_fields = false;
+    foreach ($required_fields as $field) {
+        if (empty($_POST[$field])) {
+            $missing_fields = true;
+            break;
+        }
+    }
+
+    if ($missing_fields) {
+        $message = '<p style="color:red;">Por favor, preencha todos os campos obrigatórios.</p>';
+    } else {
+        // Prepare and bind parameters for insertion
+        $login = $_POST['login'];
+        $email = $_POST['email'];
+        $cpf = $_POST['cpf'];
+        $data_nasc = $_POST['data_nasc'];
+        $end_estado = $_POST['end_estado'];
+        $end_cidade = $_POST['end_cidade'];
+        $end_bairro = $_POST['end_bairro'];
+        $end_logradouro = $_POST['end_logradouro'];
+        $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("INSERT INTO cliente (login, email, cpf, data_nasc, end_estado, end_cidade, end_bairro, end_logradouro, senha) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssss", $login, $email, $cpf, $data_nasc, $end_estado, $end_cidade, $end_bairro, $end_logradouro, $senha);
+
+        if ($stmt->execute()) {
+            $message = '<p style="color:green;">Usuário adicionado com sucesso!</p>';
+        } else {
+            $message = '<p style="color:red;">Erro ao adicionar usuário: ' . $stmt->error . '</p>';
+        }
+    }
+}
+
 // Pede todos os campos da tabela cliente
 $usuarios = $conn->query("SELECT * FROM cliente");
 ?>
@@ -25,7 +62,7 @@ $usuarios = $conn->query("SELECT * FROM cliente");
     <h2>Bem-vindo <?php echo $_SESSION['nome']; ?>!</h2>
     <p>Gerencie os usuários abaixo:</p>
 
-    <form action="adiciona_usuario.php" method="POST" class="form-inline">
+    <form action="" method="POST" class="form-inline">
         <input type="text" name="login" placeholder="Login" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="text" name="cpf" placeholder="CPF" required>
@@ -65,6 +102,7 @@ $usuarios = $conn->query("SELECT * FROM cliente");
             <?php endwhile; ?>
         </tbody>
     </table>
+    <?php echo $message; ?>
 </div>
 
 </body>
