@@ -102,3 +102,27 @@ body, html {
   color: #a93226;
   text-decoration: underline;
 }
+
+/* Estilo para o grid do formulário de cadastro */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px; /* Espaço entre os inputs lado a lado */
+  row-gap: 10px;    /* Espaço entre uma linha de inputs e outra */
+}
+
+/* Ajusta o botão para ocupar as 2 colunas */
+.form-buttons {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-buttons button {
+  width: 50%;
+}
+
+.form-buttons p {
+  margin-top: 10px;
+} 
