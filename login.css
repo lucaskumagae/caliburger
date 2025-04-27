@@ -103,15 +103,13 @@ body, html {
   text-decoration: underline;
 }
 
-/* Estilo para o grid do formulário de cadastro */
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 20px; /* Espaço entre os inputs lado a lado */
-  row-gap: 10px;    /* Espaço entre uma linha de inputs e outra */
+  column-gap: 20px;
+  row-gap: 10px;  
 }
 
-/* Ajusta o botão para ocupar as 2 colunas */
 .form-buttons {
   grid-column: span 2;
   display: flex;

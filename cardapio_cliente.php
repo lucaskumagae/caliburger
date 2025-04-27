@@ -10,35 +10,6 @@ $result = mysqli_query($conn, $query);
     <meta charset="UTF-8" />
     <title>Cardápio Cliente</title>
     <link rel="stylesheet" href="main.css" />
-    <style>
-        .lanche {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .lanche img {
-            max-width: 120px;
-            height: auto;
-            border-radius: 5px;
-        }
-        .lanche-details {
-            flex-grow: 1;
-        }
-        .lanche-details h2 {
-            margin: 0 0 5px 0;
-        }
-        .lanche-details p {
-            margin: 3px 0;
-        }
-        .lanche input[type="number"] {
-            width: 60px;
-            padding: 5px;
-        }
-    </style>
 </head>
 <body>
 <?php include 'menu_cliente.php'; ?>
