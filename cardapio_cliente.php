@@ -70,6 +70,21 @@ $result = mysqli_query($conn, $query);
         </div>
         </form>
     </main>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            let allZero = true;
+            inputs.forEach(input => {
+                if (parseInt(input.value) > 0) {
+                    allZero = false;
+                }
+            });
+            if (allZero) {
+                alert("Nenhum lanche selecionado");
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
 <?php
