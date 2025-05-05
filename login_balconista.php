@@ -10,7 +10,7 @@ if (isset($_SESSION['nome'])) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tela de Login - Cali Burger</title>
+  <title>Login Balconista Dono - Cali Burger</title>
   <link rel="stylesheet" href="login.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <link rel="icon" href="imagens/logo_cali_ico.ico" type="image/x-icon" />
@@ -25,27 +25,20 @@ if (isset($_SESSION['nome'])) {
     
     <div class="right-side">
       <div class="login-container">
-        <h2>Login</h2>
-        <form action="valida_login.php" method="post">
-          <label for="login">Usuário</label>
-          <input type="text" id="login" name="login" required />
-
-          <label for="senha">Senha</label>
-          <input type="password" id="senha" name="senha" required />
+        <h2>Login Balconista Dono</h2>
+        <form action="valida_login_balconista.php" method="post">
+          <label for="cpf">CPF</label>
+          <input type="text" id="cpf" name="cpf" required />
 
           <button type="submit">Entrar</button>
 
           <?php
           if (isset($_GET['erro'])) {
-              echo "<p style='color:red; text-align:center; margin-top:10px;'>Login inválido</p>";
-          }
-          if (isset($_GET['cadastro']) && $_GET['cadastro'] === 'ok') {
-              echo "<p style='color:green; text-align:center; margin-top:10px;'>Cadastro realizado com sucesso! Faça login para continuar.</p>";
+              echo "<p style='color:red; text-align:center; margin-top:10px;'>CPF inválido</p>";
           }
           ?>
 
-          <p>Não tem uma conta? <a href="cadastro.php">Cadastre-se</a></p>
-          <p>Login para Balconista Dono? <a href="login_balconista.php">Clique aqui</a></p>
+          <p>Login para Cliente? <a href="login.php">Clique aqui</a></p>
         </form>
       </div>
     </div>

@@ -15,7 +15,7 @@ if ($result->num_rows == 1) {
     $cliente = $result->fetch_assoc();
     $_SESSION['id'] = $cliente['id'];
     $_SESSION['nome'] = $cliente['nome'];
-    header("Location: main.php");
+    header("Location: menu_cliente.php");
 } else {
     header("Location: login.php?erro=1");
 }
