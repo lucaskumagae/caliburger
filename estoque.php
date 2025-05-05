@@ -54,9 +54,13 @@ if (isset($_SESSION['msg_error'])) {
                     <td><?= $row['nome_ingrediente'] ?></td>
                     <td><?= $row['quantidade'] ?></td>
                     <td>
-                        <form action="deleta_ingrediente.php" method="POST" onsubmit="return confirm('Deseja excluir este ingrediente?');">
+                        <form action="deleta_ingrediente.php" method="POST" onsubmit="return confirm('Deseja excluir este ingrediente?');" style="display:inline-block; margin-right: 5px;">
                             <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
                             <button type="submit">Excluir</button>
+                        </form>
+                        <form action="edita_ingrediente.php" method="GET" style="display:inline-block;">
+                            <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
+                            <button type="submit">Editar</button>
                         </form>
                     </td>
                 </tr>
