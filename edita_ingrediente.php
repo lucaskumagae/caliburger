@@ -26,6 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     $ingrediente = $result->fetch_assoc();
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['cancelar'])) {
+        header("Location: estoque.php");
+        exit();
+    }
+
     if (!isset($_POST['id']) || empty($_POST['id']) || !isset($_POST['nome_ingrediente']) || !isset($_POST['quantidade'])) {
         $_SESSION['msg_error'] = "Dados incompletos para atualização.";
         header("Location: estoque.php");
@@ -84,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         <label for="quantidade">Quantidade:</label>
         <input type="number" id="quantidade" name="quantidade" value="<?= htmlspecialchars($ingrediente['quantidade']) ?>" required min="1">
         <button type="submit">Salvar</button>
-        <a href="estoque.php"><button type="button">Cancelar</button></a>
+        <button type="submit" name="cancelar">Cancelar</button>
     </form>
 </div>
 
