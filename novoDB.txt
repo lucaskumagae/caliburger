@@ -99,14 +99,28 @@ CREATE TABLE pagamento (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE pedido (
-  numero_do_pedido int(11) NOT NULL,
-  produto varchar(50) NOT NULL,
+  numero_do_pedido int(11) NOT NULL auto_increment,
+  produto varchar(50) NOT NULL,	
   valor decimal(10,2) NOT NULL,
   nome_cliente varchar(100) NOT NULL,
   aceito tinyint(1) NOT NULL DEFAULT 0,
   observacao varchar(255) DEFAULT NULL,
-  data_pedido datetime DEFAULT current_timestamp()
+  data_pedido datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (numero_do_pedido)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE itens_pedido (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  numero_do_pedido int(11) NOT NULL,
+  produto varchar(50) NOT NULL,
+  quantidade int(11) NOT NULL,
+  valor decimal(10,2) NOT NULL,
+  observacao varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (numero_do_pedido) REFERENCES pedido(numero_do_pedido)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DELETE FROM pedido WHERE numero_do_pedido > 2;
 
 INSERT INTO pedido (numero_do_pedido, produto, valor, nome_cliente, aceito, observacao, data_pedido) VALUES
 (1, 'Cali Clássico', 12.00, 'Administrador', 1, 'Sem cebola', '2025-04-14 09:58:47'),
@@ -143,8 +157,6 @@ ALTER TABLE pagamento
   ADD KEY numero_do_pedido (numero_do_pedido),
   ADD KEY id_cliente (id_cliente);
 
-ALTER TABLE pedido
-  ADD PRIMARY KEY (numero_do_pedido);
   
 ALTER TABLE pedido_estoque
   ADD PRIMARY KEY (numero_do_pedido,id_ingrediente),
