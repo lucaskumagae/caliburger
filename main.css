@@ -189,10 +189,59 @@ main.cardapio .lanche input[type="number"] {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1em;
     color: #555;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.carrinho-container a {
+.carrinho-container li label {
+    margin-top: 8px;
+    font-weight: 600;
+    color: #c0392b;
+}
+
+.carrinho-container li input[type="text"] {
+    margin-top: 5px;
+    padding: 8px 10px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    font-family: 'Poppins', sans-serif;
+}
+
+.carrinho-container li button[type="submit"] {
+    margin-top: 10px;
+    align-self: flex-start;
+    background-color: #e74c3c;
+    padding: 6px 12px;
+    font-size: 0.9em;
+    border-radius: 6px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.carrinho-container li button[type="submit"]:hover {
+    background-color: #c0392b;
+}
+
+.carrinho-container form button[type="submit"]:last-of-type {
+    margin-top: 20px;
+    background-color: #c0392b;
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+.carrinho-container form button[type="submit"]:last-of-type:hover {
+    background-color: #a93226;
+}
+
+.carrinho-container a.button-voltar {
     display: inline-block;
+    margin-bottom: 15px;
     padding: 10px 20px;
     background-color: #c0392b;
     color: white;
@@ -203,7 +252,6 @@ main.cardapio .lanche input[type="number"] {
     transition: background-color 0.3s ease;
 }
 
-.carrinho-container a:hover {
+.carrinho-container a.button-voltar:hover {
     background-color: #a93226;
 }
-  
