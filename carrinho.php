@@ -48,10 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->close();
             }
 
-            // Insert order record in pedido table with observation and total value
-            $insert_order_stmt = $conn->prepare("INSERT INTO pedido (nome_cliente, aceito, observacao, valor) VALUES (?, ?, ?, ?)");
+            // Insert order record in pedido table with observation, total value, and status
+            $insert_order_stmt = $conn->prepare("INSERT INTO pedido (nome_cliente, aceito, observacao, valor, status) VALUES (?, ?, ?, ?, ?)");
             $aceito = 1;
-            $insert_order_stmt->bind_param("sisd", $nome_cliente, $aceito, $observacao_pedido, $total_pedido);
+            $status = "Concluído";
+            $insert_order_stmt->bind_param("sisds", $nome_cliente, $aceito, $observacao_pedido, $total_pedido, $status);
             if (!$insert_order_stmt->execute()) {
                 $insert_order_stmt->close();
                 die("Erro ao inserir pedido no banco de dados.");
