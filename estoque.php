@@ -13,6 +13,7 @@ $result = $conn->query("SELECT * FROM estoque");
     <meta charset="UTF-8">
     <title>Estoque - Cali Burger</title>
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="botoes_estoque.css">
 </head>
 <body>
 
@@ -54,13 +55,13 @@ if (isset($_SESSION['msg_error'])) {
                     <td><?= $row['nome_ingrediente'] ?></td>
                     <td><?= $row['quantidade'] ?></td>
                     <td>
-                        <form action="deleta_ingrediente.php" method="POST" onsubmit="return confirm('Deseja excluir este ingrediente?');" style="display:inline-block; margin-right: 5px;">
+                        <form id="delete-form-<?= $row['id_ingrediente'] ?>" action="deleta_ingrediente.php" method="POST" style="display:inline-block; margin-right: 5px;">
                             <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
-                            <button type="submit">Excluir</button>
+                            <button type="button" class="btn-delete" data-id="<?= $row['id_ingrediente'] ?>">Excluir</button>
                         </form>
-                        <form action="edita_ingrediente.php" method="GET" style="display:inline-block;">
+                        <form id="edit-form-<?= $row['id_ingrediente'] ?>" action="edita_ingrediente.php" method="GET" style="display:inline-block;">
                             <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
-                            <button type="submit">Editar</button>
+                            <button type="button" class="btn-edit" data-id="<?= $row['id_ingrediente'] ?>">Editar</button>
                         </form>
                     </td>
                 </tr>
@@ -68,5 +69,60 @@ if (isset($_SESSION['msg_error'])) {
         </tbody>
     </table>
 </div>
+
+<div id="confirmation-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <p id="modal-message">Confirma a ação?</p>
+        <button id="confirm-btn">Confirmar</button>
+        <button id="cancel-btn">Cancelar</button>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('confirmation-modal');
+    const modalMessage = document.getElementById('modal-message');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    let currentForm = null;
+
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            currentForm = document.getElementById('delete-form-' + id);
+            modalMessage.textContent = 'Deseja excluir este ingrediente?';
+            modal.style.display = 'block';
+        });
+    });
+
+    document.querySelectorAll('.btn-edit').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            currentForm = document.getElementById('edit-form-' + id);
+            modalMessage.textContent = 'Deseja editar este ingrediente?';
+            modal.style.display = 'block';
+        });
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        if (currentForm) {
+            currentForm.submit();
+        }
+        modal.style.display = 'none';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        currentForm = null;
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+            currentForm = null;
+        }
+    });
+</script>
+
 </body>
 </html>
