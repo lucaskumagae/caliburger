@@ -112,7 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     form.addEventListener('submit', (event) => {
         if (event.submitter && event.submitter.name === 'cancelar') {
-            // Allow form to submit immediately if "Cancelar" button was clicked
             return;
         }
         event.preventDefault();

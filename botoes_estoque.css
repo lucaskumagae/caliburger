@@ -41,8 +41,7 @@
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s ease;
-    /* Unified styles for btn-delete and btn-edit */
-    font-weight: normal; /* Remove bold from btn-edit */
+    font-weight: normal;
 }
 
 .btn-delete:hover,
