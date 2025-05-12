@@ -5,6 +5,11 @@ include 'conexao.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include 'conexao.php';
 
+    // Save observations per item in session if provided
+    if (isset($_POST['observacao'])) {
+        $_SESSION['observacoes'] = $_POST['observacao'];
+    }
+
     // Handle remove item action - decrement quantity by 1
     if (isset($_POST['remove_id'])) {
         $remove_id = $_POST['remove_id'];
@@ -29,10 +34,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $observacao_pedido = $_POST['observacao_pedido'];
             }
 
-            // Insert order record in pedido table with observation
-            $insert_order_stmt = $conn->prepare("INSERT INTO pedido (nome_cliente, aceito, observacao) VALUES (?, ?, ?)");
+            // Calculate total order value
+            $total_pedido = 0;
+            foreach ($_SESSION['carrinho'] as $id => $quantidade) {
+                $stmt = $conn->prepare("SELECT preco FROM cardapio WHERE id = ?");
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $preco = $result->fetch_assoc()['preco'];
+                    $total_pedido += $preco * $quantidade;
+                }
+                $stmt->close();
+            }
+
+            // Insert order record in pedido table with observation and total value
+            $insert_order_stmt = $conn->prepare("INSERT INTO pedido (nome_cliente, aceito, observacao, valor) VALUES (?, ?, ?, ?)");
             $aceito = 1;
-            $insert_order_stmt->bind_param("sis", $nome_cliente, $aceito, $observacao_pedido);
+            $insert_order_stmt->bind_param("sisd", $nome_cliente, $aceito, $observacao_pedido, $total_pedido);
             if (!$insert_order_stmt->execute()) {
                 $insert_order_stmt->close();
                 die("Erro ao inserir pedido no banco de dados.");
@@ -89,11 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     }
 
-    // Save observations per item in session if provided
-    if (isset($_POST['observacao'])) {
-        $_SESSION['observacoes'] = $_POST['observacao'];
-    }
-
     // Redirect to refresh the page and show updated cart
     header('Location: carrinho.php');
     exit;
@@ -118,13 +132,24 @@ include 'menu_cliente.php';
         if (!empty($_SESSION['carrinho'])) {
             echo '<form method="POST" action="carrinho.php">';
             echo '<ul>';
+            $total = 0;
             foreach ($_SESSION['carrinho'] as $id => $quantidade) {
-                // Query lanche name by id
-                $stmt = $conn->prepare("SELECT nome FROM cardapio WHERE id = ?");
+                // Query lanche name and price by id
+                $stmt = $conn->prepare("SELECT nome, preco FROM cardapio WHERE id = ?");
                 $stmt->bind_param("i", $id);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $nome = $result->num_rows > 0 ? $result->fetch_assoc()['nome'] : "Lanche desconhecido";
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();
+                    $nome = $row['nome'];
+                    $preco = $row['preco'];
+                } else {
+                    $nome = "Lanche desconhecido";
+                    $preco = 0;
+                }
+
+                // Accumulate total price
+                $total += $preco * $quantidade;
 
                 // Get existing observation if any
                 $observacao = '';
@@ -143,6 +168,7 @@ echo ' <button type="submit" name="remove_id" value="' . $id . '">Remover</butto
                 $stmt->close();
             }
             echo '</ul>';
+            echo '<p class="total-pedido"><strong>Total do pedido: R$ ' . number_format($total, 2, ',', '.') . '</strong></p>';
             echo '<a href="cardapio_cliente.php" class="button-voltar">Voltar ao cardápio</a>';
             echo '<button type="submit" name="finalizar_pedido" value="1">Finalizar Pedido</button>';
             echo '</form>';
