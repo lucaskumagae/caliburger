@@ -10,16 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
 
-        if ($action === 'add') {
+if ($action === 'add') {
             $nome = $conn->real_escape_string($_POST['nome']);
             $descricao = $conn->real_escape_string($_POST['descricao']);
             $preco = floatval($_POST['preco']);
-            $conn->query("INSERT INTO cardapio (nome, descricao, preco) VALUES ('$nome', '$descricao', $preco)");
+            $imagem = $conn->real_escape_string($_POST['imagem']);
+            $conn->query("INSERT INTO cardapio (nome, descricao, preco, imagem) VALUES ('$nome', '$descricao', $preco, '$imagem')");
             $_SESSION['message'] = "Item adicionado com sucesso!";
             header("Location: cardapio.php");
             exit();
         } elseif ($action === 'delete') {
             $id = intval($_POST['id']);
+            $conn->query("DELETE FROM cardapio_ingrediente WHERE id_cardapio = $id");
             $conn->query("DELETE FROM cardapio WHERE id = $id");
             $_SESSION['message'] = "Item excluído com sucesso!";
             header("Location: cardapio.php");
@@ -28,12 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = intval($_POST['id']);
             $edit_result = $conn->query("SELECT * FROM cardapio WHERE id = $id");
             $edit_row = $edit_result->fetch_assoc();
-        } elseif ($action === 'edit') {
+        } elseif ($action ===    'edit') {
             $id = intval($_POST['id']);
             $nome = $conn->real_escape_string($_POST['nome']);
             $descricao = $conn->real_escape_string($_POST['descricao']);
             $preco = floatval($_POST['preco']);
-            $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco WHERE id=$id");
+            $imagem = $conn->real_escape_string($_POST['imagem']);
+            $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem' WHERE id=$id");
             $_SESSION['message'] = "Item atualizado com sucesso!";
             header("Location: cardapio.php");
             exit();
@@ -80,14 +83,15 @@ $result = $conn->query($sql);
     <button onclick="document.getElementById('addForm').style.display='block'">Adicionar Novo Item</button>
 
     <div id="addForm" style="display:none; margin-bottom: 20px;">
-        <form method="POST" action="cardapio.php">
-            <input type="hidden" name="action" value="add">
-            <label>Nome: <input type="text" name="nome" required></label>
-            <label>Descrição: <input type="text" name="descricao"></label>
-            <label>Preço: <input type="number" step="0.01" name="preco" required></label>
-            <button type="submit">Salvar</button>
-            <button type="button" onclick="document.getElementById('addForm').style.display='none'">Cancelar</button>
-        </form>
+            <form method="POST" action="cardapio.php">
+                <input type="hidden" name="action" value="add">
+                <label>Nome: <input type="text" name="nome" required></label>
+                <label>Descrição: <input type="text" name="descricao"></label>
+                <label>Preço: <input type="number" step="0.01" name="preco" required></label>
+                <label>Imagem (nome do arquivo): <input type="text" name="imagem"></label>
+                <button type="submit">Salvar</button>
+                <button type="button" onclick="document.getElementById('addForm').style.display='none'">Cancelar</button>
+            </form>
     </div>
 
     <table class="styled-table">
@@ -97,6 +101,7 @@ $result = $conn->query($sql);
                 <th>Nome</th>
                 <th>Descrição</th>
                 <th>Preço</th>
+                <th>Imagem</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -107,6 +112,13 @@ $result = $conn->query($sql);
                     <td><?= $row['nome'] ?></td>
                     <td><?= $row['descricao'] ?></td>
                     <td><?= number_format($row['preco'], 2, ',', '.') ?></td>
+                    <td>
+                        <?php if (!empty($row['imagem'])): ?>
+                            <img src="imagens/lanches/<?= htmlspecialchars($row['imagem']) ?>" alt="<?= htmlspecialchars($row['nome']) ?>" style="max-width: 100px; max-height: 100px;">
+                        <?php else: ?>
+                            Sem imagem
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <form method="POST" action="cardapio.php" style="display:inline;">
                             <input type="hidden" name="action" value="edit_form">
@@ -133,6 +145,7 @@ $result = $conn->query($sql);
             <label>Nome: <input type="text" name="nome" value="<?= htmlspecialchars($edit_row['nome']) ?>" required></label>
             <label>Descrição: <input type="text" name="descricao" value="<?= htmlspecialchars($edit_row['descricao']) ?>"></label>
             <label>Preço: <input type="number" step="0.01" name="preco" value="<?= number_format($edit_row['preco'], 2, '.', '') ?>" required></label>
+            <label>Imagem (nome do arquivo): <input type="text" name="imagem" value="<?= htmlspecialchars($edit_row['imagem']) ?>"></label>
             <button type="submit">Atualizar</button>
             <button type="button" onclick="window.location.href='cardapio.php'">Cancelar</button>
         </form>
