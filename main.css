@@ -255,3 +255,11 @@ main.cardapio .lanche input[type="number"] {
 .carrinho-container a.button-voltar:hover {
     background-color: #a93226;
 }
+
+.item-img {
+    height: 60px;
+    width: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 20px;
+}

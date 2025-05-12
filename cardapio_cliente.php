@@ -4,60 +4,92 @@ include 'conexao.php';
 $query = "SELECT id, nome, descricao, preco, imagem FROM cardapio";
 $result = mysqli_query($conn, $query);
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8" />
-    <title>Cardápio Cliente</title>
-    <link rel="stylesheet" href="main.css" />
-</head>
-<body>
-<?php include 'menu_cliente.php'; ?>
-    <main class="cardapio">
-        <form method="POST" action="carrinho.php">
-        <?php
-        if ($result && mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo '<div class="lanche">';
-                
-                echo '<img src="imagens/lanches/' . htmlspecialchars($row['imagem']) . '" alt="' . htmlspecialchars($row['nome']) . '">';
-                
-                echo '<div class="lanche-details">';
-                echo '<h2>' . htmlspecialchars($row['nome']) . '</h2>';
-                echo '<p>' . htmlspecialchars($row['descricao']) . '</p>';
-                echo '<p>R$' . htmlspecialchars(number_format($row['preco'], 2, ',', '.')) . '</p>';
-                echo '</div>';
-                
-                echo '<input type="number" name="quantidade[' . $row['id'] . ']" min="0" value="0" />';
-                echo '</div>';
+    <head>
+        <meta charset="UTF-8" />
+        <title>Cardápio Cliente</title>
+        <link rel="stylesheet" href="main.css" />
+        <style>
+            .item-img {
+                height: 60px !important;
+                width: auto !important;
+                object-fit: cover;
+                border-radius: 10px;
+                margin-right: 20px;
             }
-        } else {
-            echo '<p>Nenhum lanche encontrado.</p>';
-        }
-        ?>
+            .cardapio-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 20px;
+            }
+            .item-cardapio {
+                border: 1px solid #ccc;
+                padding: 25px 30px;
+                margin: 10px 0;
+                border-radius: 10px;
+                max-width: 850px;
+                width: 100%;
+                background-color: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .item-info {
+                flex: 1;
+                margin-left: 10px;
+            }
+            .item-quantidade input[type="number"] {
+                width: 60px;
+                padding: 5px;
+                font-size: 1em;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+            }
+        </style>
+    </head>
+<body>
+<header>
+    <div class="logo-area">
+        <img src="imagens/logo_cali_sem_fundo.png" alt="Logo Cali Burger">
+        <h1>Cali Burger</h1>
+    </div>
+</header>
 
-        <div style="text-align: right; margin-top: 10px;">
-            <button type="submit">Adicionar</button>
-        </div>
+<nav>
+    <a href="cardapio_cliente.php">Cardápio</a>
+    <a href="carrinho.php">Carrinho</a>
+    <a href="sair.php" class="logout">Sair</a>
+</nav>
+
+    <main class="cardapio-container">
+        <form method="POST" action="carrinho.php">
+            <?php if ($result && mysqli_num_rows($result) > 0): ?>
+                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                    <div class="item-cardapio">
+                        <img src="imagens/lanches/<?= htmlspecialchars($row['imagem']) ?>" alt="<?= htmlspecialchars($row['nome']) ?>" class="item-img">
+                        <div class="item-info">
+                            <h3><?= htmlspecialchars($row['nome']) ?></h3>
+                            <p><?= htmlspecialchars($row['descricao']) ?></p>
+                            <strong>R$<?= number_format($row['preco'], 2, ',', '.') ?></strong>
+                        </div>
+                        <div class="item-quantidade">
+                            <input type="number" name="quantidade[<?= $row['id'] ?>]" value="0" min="0">
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>Nenhum item no cardápio.</p>
+            <?php endif; ?>
+
+            <div class="botao-adicionar">
+                <button type="submit">Adicionar</button>
+            </div>
         </form>
     </main>
-    <script>
-        document.querySelector('form').addEventListener('submit', function(event) {
-            const inputs = document.querySelectorAll('input[type="number"]');
-            let allZero = true;
-            inputs.forEach(input => {
-                if (parseInt(input.value) > 0) {
-                    allZero = false;
-                }
-            });
-            if (allZero) {
-                alert("Nenhum lanche selecionado");
-                event.preventDefault();
-            }
-        });
-    </script>
 </body>
 </html>
-<?php
-mysqli_close($conn);
-?>
