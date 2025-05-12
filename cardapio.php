@@ -6,6 +6,12 @@ if (!isset($_SESSION['nome'])) {
 }
 include 'conexao.php';
 
+$ingredientes_result = $conn->query("SELECT id_ingrediente, nome_ingrediente FROM estoque ORDER BY nome_ingrediente");
+$ingredientes_list = [];
+while ($row = $ingredientes_result->fetch_assoc()) {
+    $ingredientes_list[] = $row;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
@@ -16,6 +22,18 @@ if ($action === 'add') {
             $preco = floatval($_POST['preco']);
             $imagem = $conn->real_escape_string($_POST['imagem']);
             $conn->query("INSERT INTO cardapio (nome, descricao, preco, imagem) VALUES ('$nome', '$descricao', $preco, '$imagem')");
+            $new_id = $conn->insert_id;
+
+            // Insert ingredients
+            if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
+                foreach ($_POST['ingredientes'] as $id_ingrediente => $quantidade_utilizada) {
+                    $quantidade_utilizada = intval($quantidade_utilizada);
+                    if ($quantidade_utilizada > 0) {
+                        $conn->query("INSERT INTO cardapio_ingrediente (id_cardapio, id_ingrediente, quantidade_utilizada) VALUES ($new_id, $id_ingrediente, $quantidade_utilizada)");
+                    }
+                }
+            }
+
             $_SESSION['message'] = "Item adicionado com sucesso!";
             header("Location: cardapio.php");
             exit();
@@ -30,6 +48,13 @@ if ($action === 'add') {
             $id = intval($_POST['id']);
             $edit_result = $conn->query("SELECT * FROM cardapio WHERE id = $id");
             $edit_row = $edit_result->fetch_assoc();
+
+            // Fetch ingredients for this cardapio item
+            $ingredientes_cardapio = [];
+            $ingredientes_result = $conn->query("SELECT id_ingrediente, quantidade_utilizada FROM cardapio_ingrediente WHERE id_cardapio = $id");
+            while ($row = $ingredientes_result->fetch_assoc()) {
+                $ingredientes_cardapio[$row['id_ingrediente']] = $row['quantidade_utilizada'];
+            }
         } elseif ($action ===    'edit') {
             $id = intval($_POST['id']);
             $nome = $conn->real_escape_string($_POST['nome']);
@@ -37,6 +62,18 @@ if ($action === 'add') {
             $preco = floatval($_POST['preco']);
             $imagem = $conn->real_escape_string($_POST['imagem']);
             $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem' WHERE id=$id");
+
+            // Update ingredients
+            $conn->query("DELETE FROM cardapio_ingrediente WHERE id_cardapio = $id");
+            if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
+                foreach ($_POST['ingredientes'] as $id_ingrediente => $quantidade_utilizada) {
+                    $quantidade_utilizada = intval($quantidade_utilizada);
+                    if ($quantidade_utilizada > 0) {
+                        $conn->query("INSERT INTO cardapio_ingrediente (id_cardapio, id_ingrediente, quantidade_utilizada) VALUES ($id, $id_ingrediente, $quantidade_utilizada)");
+                    }
+                }
+            }
+
             $_SESSION['message'] = "Item atualizado com sucesso!";
             header("Location: cardapio.php");
             exit();
@@ -54,12 +91,21 @@ if (count($zero_ingredients) > 0) {
     $conditions = [];
     foreach ($zero_ingredients as $ingredient) {
         $escaped_ingredient = $conn->real_escape_string($ingredient);
-        $conditions[] = "descricao NOT LIKE '%$escaped_ingredient%'";
+        $conditions[] = "c.descricao NOT LIKE '%$escaped_ingredient%'";
     }
     $where_clause = implode(' AND ', $conditions);
-    $sql = "SELECT * FROM cardapio WHERE $where_clause";
+    $sql = "SELECT c.*, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
+            FROM cardapio c
+            LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
+            LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
+            WHERE $where_clause
+            GROUP BY c.id";
 } else {
-    $sql = "SELECT * FROM cardapio";
+    $sql = "SELECT c.*, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
+            FROM cardapio c
+            LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
+            LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
+            GROUP BY c.id";
 }
 
 $result = $conn->query($sql);
@@ -89,6 +135,15 @@ $result = $conn->query($sql);
                 <label>Descrição: <input type="text" name="descricao"></label>
                 <label>Preço: <input type="number" step="0.01" name="preco" required></label>
                 <label>Imagem (nome do arquivo): <input type="text" name="imagem"></label>
+                <fieldset>
+                    <legend>Ingredientes</legend>
+                    <?php foreach ($ingredientes_list as $ingrediente): ?>
+                        <label>
+                            <?= htmlspecialchars($ingrediente['nome_ingrediente']) ?>:
+                            <input type="number" name="ingredientes[<?= $ingrediente['id_ingrediente'] ?>]" min="0" value="0" style="width: 60px;">
+                        </label><br>
+                    <?php endforeach; ?>
+                </fieldset>
                 <button type="submit">Salvar</button>
                 <button type="button" onclick="document.getElementById('addForm').style.display='none'">Cancelar</button>
             </form>
@@ -100,6 +155,7 @@ $result = $conn->query($sql);
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Descrição</th>
+                <th>Ingredientes</th>
                 <th>Preço</th>
                 <th>Imagem</th>
                 <th>Ações</th>
@@ -111,6 +167,7 @@ $result = $conn->query($sql);
                     <td><?= $row['id'] ?></td>
                     <td><?= $row['nome'] ?></td>
                     <td><?= $row['descricao'] ?></td>
+                    <td><?= htmlspecialchars($row['ingredientes']) ?></td>
                     <td><?= number_format($row['preco'], 2, ',', '.') ?></td>
                     <td>
                         <?php if (!empty($row['imagem'])): ?>
@@ -146,6 +203,19 @@ $result = $conn->query($sql);
             <label>Descrição: <input type="text" name="descricao" value="<?= htmlspecialchars($edit_row['descricao']) ?>"></label>
             <label>Preço: <input type="number" step="0.01" name="preco" value="<?= number_format($edit_row['preco'], 2, '.', '') ?>" required></label>
             <label>Imagem (nome do arquivo): <input type="text" name="imagem" value="<?= htmlspecialchars($edit_row['imagem']) ?>"></label>
+            <fieldset>
+                <legend>Ingredientes</legend>
+                <?php foreach ($ingredientes_list as $ingrediente): ?>
+                    <?php
+                        $id_ing = $ingrediente['id_ingrediente'];
+                        $quant = isset($ingredientes_cardapio[$id_ing]) ? $ingredientes_cardapio[$id_ing] : 0;
+                    ?>
+                    <label>
+                        <?= htmlspecialchars($ingrediente['nome_ingrediente']) ?>:
+                        <input type="number" name="ingredientes[<?= $id_ing ?>]" min="0" value="<?= $quant ?>" style="width: 60px;">
+                    </label><br>
+                <?php endforeach; ?>
+            </fieldset>
             <button type="submit">Atualizar</button>
             <button type="button" onclick="window.location.href='cardapio.php'">Cancelar</button>
         </form>
