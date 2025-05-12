@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <meta charset="UTF-8">
     <title>Editar Ingrediente - Cali Burger</title>
     <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="botoes_estoque.css">
 </head>
 <body>
 
@@ -82,16 +83,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
     ?>
 
-    <form action="edita_ingrediente.php" method="POST" class="form-inline">
+    <form action="edita_ingrediente.php" method="POST" class="form-inline" id="edit-ingredient-form">
         <input type="hidden" name="id" value="<?= htmlspecialchars($ingrediente['id_ingrediente']) ?>">
         <label for="nome_ingrediente">Ingrediente:</label>
         <input type="text" id="nome_ingrediente" name="nome_ingrediente" value="<?= htmlspecialchars($ingrediente['nome_ingrediente']) ?>" required>
         <label for="quantidade">Quantidade:</label>
         <input type="number" id="quantidade" name="quantidade" value="<?= htmlspecialchars($ingrediente['quantidade']) ?>" required min="1">
-        <button type="submit">Salvar</button>
+        <button type="submit" id="save-btn">Salvar</button>
         <button type="submit" name="cancelar">Cancelar</button>
     </form>
 </div>
+
+<div id="confirmation-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <p id="modal-message">Confirma a ação?</p>
+        <button id="confirm-btn">Confirmar</button>
+        <button id="cancel-btn">Cancelar</button>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('confirmation-modal');
+    const modalMessage = document.getElementById('modal-message');
+    const confirmBtn = document.getElementById('confirm-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const form = document.getElementById('edit-ingredient-form');
+
+    form.addEventListener('submit', (event) => {
+        if (event.submitter && event.submitter.name === 'cancelar') {
+            // Allow form to submit immediately if "Cancelar" button was clicked
+            return;
+        }
+        event.preventDefault();
+        modalMessage.textContent = 'Deseja salvar as alterações deste ingrediente?';
+        modal.style.display = 'block';
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        form.submit();
+        modal.style.display = 'none';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>

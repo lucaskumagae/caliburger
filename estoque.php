@@ -61,7 +61,7 @@ if (isset($_SESSION['msg_error'])) {
                         </form>
                         <form id="edit-form-<?= $row['id_ingrediente'] ?>" action="edita_ingrediente.php" method="GET" style="display:inline-block;">
                             <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
-                            <button type="button" class="btn-edit" data-id="<?= $row['id_ingrediente'] ?>">Editar</button>
+                            <button type="submit" class="btn-edit" data-id="<?= $row['id_ingrediente'] ?>">Editar</button>
                         </form>
                     </td>
                 </tr>
@@ -87,21 +87,14 @@ if (isset($_SESSION['msg_error'])) {
     let currentForm = null;
 
     document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', () => {
-            const id = button.getAttribute('data-id');
-            currentForm = document.getElementById('delete-form-' + id);
-            modalMessage.textContent = 'Deseja excluir este ingrediente?';
-            modal.style.display = 'block';
-        });
-    });
-
-    document.querySelectorAll('.btn-edit').forEach(button => {
-        button.addEventListener('click', () => {
-            const id = button.getAttribute('data-id');
-            currentForm = document.getElementById('edit-form-' + id);
-            modalMessage.textContent = 'Deseja editar este ingrediente?';
-            modal.style.display = 'block';
-        });
+        if (button.closest('form').id.startsWith('delete-form-')) {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                currentForm = document.getElementById('delete-form-' + id);
+                modalMessage.textContent = 'Deseja excluir este ingrediente?';
+                modal.style.display = 'block';
+            });
+        }
     });
 
     confirmBtn.addEventListener('click', () => {
