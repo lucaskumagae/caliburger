@@ -63,6 +63,7 @@ $result = mysqli_query($conn, $query);
 <nav>
     <a href="cardapio_cliente.php">Cardápio</a>
     <a href="carrinho.php">Carrinho</a>
+    <a href="meus_pedidos.php">Meus pedidos</a>
     <a href="sair.php" class="logout">Sair</a>
 </nav>
 
