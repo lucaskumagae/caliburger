@@ -23,15 +23,17 @@ function validaCPF($cpf) {
     return true;
 }
 
-if (!isset($_POST['cpf'])) {
+if (!isset($_POST['cpf']) || !isset($_POST['senha'])) {
     header("Location: login_balconista.php?erro=1");
     exit();
 }
 
 $cpf = $_POST['cpf'];
+$senha = $_POST['senha'];
 
 if (!validaCPF($cpf)) {
-    header("Location: login_balconista.php?erro=1");
+    // CPF validation failed
+    header("Location: login_balconista.php?erro=cpf");
     exit();
 }
 
@@ -41,13 +43,21 @@ $stmt->bind_param("s", $cpf);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows == 1) {
+if ($result->num_rows === 1) {
     $balconista = $result->fetch_assoc();
-    $_SESSION['id'] = $balconista['id'];
-    $_SESSION['nome'] = $balconista['nome'];
-    header("Location: main.php");
+    if ($balconista['senha'] === $senha) {
+        $_SESSION['id'] = $balconista['id'];
+        $_SESSION['nome'] = $balconista['nome'];
+        header("Location: main.php");
+        exit();
+    } else {
+        header("Location: login_balconista.php?erro=senha");
+        exit();
+    }
 } else {
-    header("Location: login_balconista.php?erro=1");
+    // No matching CPF found
+    header("Location: login_balconista.php?erro=cpf");
+    exit();
 }
 
 $conn->close();

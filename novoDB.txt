@@ -15,12 +15,14 @@ CREATE TABLE balconista_dono (
   nome varchar(100) NOT NULL,
   data_nasc date NOT NULL,
   email varchar(255) NOT NULL,
-  sexo varchar(50) NOT NULL
+  sexo varchar(50) NOT NULL,
+  senha varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO balconista_dono (cpf, nome, data_nasc, email, sexo) VALUES
-('35265811001', 'admin', '1985-01-01', 'admin@caliburger.com', 'Masculino'),
-('54349918000', 'teste', '1995-05-05', 'teste@caliburger.com', 'Feminino');
+
+INSERT INTO balconista_dono (cpf, nome, data_nasc, email, sexo, senha) VALUES
+('35265811001', 'admin', '1985-01-01', 'admin@caliburger.com', 'Masculino', '123'),
+('54349918000', 'teste', '1995-05-05', 'teste@caliburger.com', 'Feminino', '123');
 
 CREATE TABLE cardapio (
   id int(11) NOT NULL,

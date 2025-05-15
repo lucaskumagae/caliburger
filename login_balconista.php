@@ -30,11 +30,20 @@ if (isset($_SESSION['nome'])) {
           <label for="cpf">CPF</label>
           <input type="text" id="cpf" name="cpf" required />
 
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" required />
+
           <button type="submit">Entrar</button>
 
           <?php
           if (isset($_GET['erro'])) {
-              echo "<p style='color:red; text-align:center; margin-top:10px;'>CPF inválido</p>";
+              if ($_GET['erro'] === 'cpf') {
+                  echo "<p style='color:red; text-align:center; margin-top:10px;'>CPF inválido</p>";
+              } elseif ($_GET['erro'] === 'senha') {
+                  echo "<p style='color:red; text-align:center; margin-top:10px;'>Senha inválida</p>";
+              } else {
+                  echo "<p style='color:red; text-align:center; margin-top:10px;'>Erro de login</p>";
+              }
           }
           ?>
 
