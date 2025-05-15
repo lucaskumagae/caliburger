@@ -62,7 +62,7 @@ foreach ($_SESSION['carrinho'] as $id => $quantidade) {
         }
         .pagamento-container h1 {
             text-align: center;
-            color: #333333; /* match menu navigation color */
+            color: #333333;
             margin-bottom: 20px;
             font-weight: 700;
         }
@@ -72,11 +72,11 @@ foreach ($_SESSION['carrinho'] as $id => $quantidade) {
         .section h2 {
             font-size: 1.2em;
             margin-bottom: 10px;
-            color: #333333; /* match menu navigation color */
+            color: #333333;
             border-bottom: 2px solid #333333;
             padding-bottom: 5px;
         }
-        .address, .payment-options, .order-details {
+        .address, .delivery-options, .order-details {
             padding: 10px 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -123,16 +123,11 @@ foreach ($_SESSION['carrinho'] as $id => $quantidade) {
             margin-right: 15px;
             font-weight: 600;
         }
-        .payment-options label, .delivery-options label {
-            display: inline-block;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-        a.button-voltar {
+        a.button-voltar, a.button-editar {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 25px;
-            background-color: #333333; /* match menu navigation color */
+            background-color: #333333;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -140,28 +135,31 @@ foreach ($_SESSION['carrinho'] as $id => $quantidade) {
             text-align: center;
             transition: background-color 0.3s ease;
         }
-        a.button-voltar:hover {
+        a.button-voltar:hover, a.button-editar:hover {
             background-color: #555555;
+        }
+        .qr-code {
+            display: block;
+            margin: 15px auto;
+            max-width: 200px;
         }
     </style>
 </head>
 <body>
     <main class="pagamento-container">
-        <h1>Pagamento</h1>
+        <h1>Pagamento via PIX</h1>
 
         <div class="section address">
             <h2>Endereço de Entrega</h2>
             <p><?php echo htmlspecialchars($endereco); ?></p>
+            <a href="editar_endereco.php" class="button-editar">Editar Endereço</a>
         </div>
 
         <form method="post" action="pedido_sucesso.php">
 
             <div class="section payment-options">
-                <h2>Opções de Pagamento</h2>
-                <label><input type="radio" name="pagamento" value="cartao_credito" required> Cartão de Crédito</label><br />
-                <label><input type="radio" name="pagamento" value="cartao_debito"> Cartão de Débito</label><br />
-                <label><input type="radio" name="pagamento" value="dinheiro"> Dinheiro</label><br />
-                <label><input type="radio" name="pagamento" value="pix"> PIX</label>
+                <h2>PIX</h2>
+                <img src="imagens/qrcode.png" alt="QR Code PIX" class="qr-code" />
             </div>
 
             <div class="section order-details">
