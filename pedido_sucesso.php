@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
             $observacao_pedido = $_SESSION['observacao_pedido'];
         }
 
-        // Calculate total order value
         $total_pedido = 0;
         foreach ($_SESSION['carrinho'] as $id => $quantidade) {
             $stmt = $conn->prepare("SELECT preco FROM cardapio WHERE id = ?");
@@ -26,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
             $stmt->close();
         }
 
-        // Insert order record in pedido table with observation, total value, and status
         $insert_order_stmt = $conn->prepare("INSERT INTO pedido (nome_cliente, aceito, observacao, valor, status) VALUES (?, ?, ?, ?, ?)");
         $aceito = 1;
         $status = "Concluído";
@@ -38,9 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
         $numero_do_pedido = $conn->insert_id;
         $insert_order_stmt->close();
 
-        // Insert each item in itens_pedido table
         foreach ($_SESSION['carrinho'] as $id => $quantidade) {
-            // Get product name and price
             $stmt = $conn->prepare("SELECT nome, preco FROM cardapio WHERE id = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
@@ -60,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
                 $observacao = $_SESSION['observacoes'][$id];
             }
 
-            // Insert item into itens_pedido table
             $insert_item_stmt = $conn->prepare("INSERT INTO itens_pedido (numero_do_pedido, produto, quantidade, valor, observacao) VALUES (?, ?, ?, ?, ?)");
             $insert_item_stmt->bind_param("isids", $numero_do_pedido, $produto, $quantidade, $valor, $observacao);
             if (!$insert_item_stmt->execute()) {
@@ -68,18 +63,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
                 die("Erro ao inserir item do pedido no banco de dados.");
             }
             $insert_item_stmt->close();
+
+            $ingredientes_stmt = $conn->prepare("SELECT id_ingrediente, quantidade_utilizada FROM cardapio_ingrediente WHERE id_cardapio = ?");
+            $ingredientes_stmt->bind_param("i", $id);
+            $ingredientes_stmt->execute();
+            $ingredientes_result = $ingredientes_stmt->get_result();
+            while ($ingrediente = $ingredientes_result->fetch_assoc()) {
+                $id_ingrediente = $ingrediente['id_ingrediente'];
+                $quantidade_utilizada = $ingrediente['quantidade_utilizada'] * $quantidade;
+
+                $update_estoque_stmt = $conn->prepare("UPDATE estoque SET quantidade = quantidade - ? WHERE id_ingrediente = ? AND quantidade >= ?");
+                $update_estoque_stmt->bind_param("iii", $quantidade_utilizada, $id_ingrediente, $quantidade_utilizada);
+                $update_estoque_stmt->execute();
+                if ($update_estoque_stmt->affected_rows === 0) {
+                    $update_estoque_stmt->close();
+                    die('Estoque insuficiente para o ingrediente ID: ' . $id_ingrediente);
+                }
+                $update_estoque_stmt->close();
+            }
+            $ingredientes_stmt->close();
         }
 
-        // Clear cart and observations
         unset($_SESSION['carrinho']);
         unset($_SESSION['observacoes']);
     } else {
-        // No cart found, redirect to cart page
         header("Location: carrinho.php");
         exit();
     }
 } else {
-    // Accessed without payment confirmation, redirect to cart
     header("Location: carrinho.php");
     exit();
 }
