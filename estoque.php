@@ -87,15 +87,14 @@ if (isset($_SESSION['msg_error'])) {
     let currentForm = null;
 
     document.querySelectorAll('.btn-delete').forEach(button => {
-        if (button.closest('form').id.startsWith('delete-form-')) {
-            button.addEventListener('click', () => {
-                const id = button.getAttribute('data-id');
-                currentForm = document.getElementById('delete-form-' + id);
-                modalMessage.textContent = 'Deseja excluir este ingrediente?';
-                modal.style.display = 'block';
-            });
-        }
+        button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            currentForm = document.getElementById('delete-form-' + id);
+            modalMessage.textContent = 'Deseja excluir este ingrediente?';
+            modal.style.display = 'block';
+        });
     });
+
 
     confirmBtn.addEventListener('click', () => {
         if (currentForm) {
