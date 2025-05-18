@@ -6,6 +6,12 @@ if (!isset($_SESSION['nome'])) {
 }
 include 'conexao.php';
 
+$categoria_result = $conn->query("SELECT id, nome FROM categoria ORDER BY nome");
+$categoria_list = [];
+while ($row = $categoria_result->fetch_assoc()) {
+    $categoria_list[] = $row;
+}
+
 $ingredientes_result = $conn->query("SELECT id_ingrediente, nome_ingrediente FROM estoque ORDER BY nome_ingrediente");
 $ingredientes_list = [];
 while ($row = $ingredientes_result->fetch_assoc()) {
@@ -21,7 +27,8 @@ if ($action === 'add') {
             $descricao = $conn->real_escape_string($_POST['descricao']);
             $preco = floatval($_POST['preco']);
             $imagem = $conn->real_escape_string($_POST['imagem']);
-            $conn->query("INSERT INTO cardapio (nome, descricao, preco, imagem) VALUES ('$nome', '$descricao', $preco, '$imagem')");
+            $categoria_id = intval($_POST['categoria']);
+            $conn->query("INSERT INTO cardapio (nome, descricao, preco, imagem, categoria_id) VALUES ('$nome', '$descricao', $preco, '$imagem', $categoria_id)");
             $new_id = $conn->insert_id;
 
             // Insert ingredients
@@ -55,13 +62,21 @@ if ($action === 'add') {
             while ($row = $ingredientes_result->fetch_assoc()) {
                 $ingredientes_cardapio[$row['id_ingrediente']] = $row['quantidade_utilizada'];
             }
-        } elseif ($action ===    'edit') {
+
+            // Fetch categoria_id for edit form select
+            if (isset($edit_row['categoria_id'])) {
+                $edit_row['categoria_id'] = intval($edit_row['categoria_id']);
+            } else {
+                $edit_row['categoria_id'] = null;
+            }
+} elseif ($action ===    'edit') {
             $id = intval($_POST['id']);
             $nome = $conn->real_escape_string($_POST['nome']);
             $descricao = $conn->real_escape_string($_POST['descricao']);
             $preco = floatval($_POST['preco']);
             $imagem = $conn->real_escape_string($_POST['imagem']);
-            $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem' WHERE id=$id");
+            $categoria_id = intval($_POST['categoria']);
+            $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem', categoria_id=$categoria_id WHERE id=$id");
 
             // Update ingredients
             $conn->query("DELETE FROM cardapio_ingrediente WHERE id_cardapio = $id");
@@ -94,15 +109,17 @@ if (count($zero_ingredients) > 0) {
         $conditions[] = "c.descricao NOT LIKE '%$escaped_ingredient%'";
     }
     $where_clause = implode(' AND ', $conditions);
-    $sql = "SELECT c.*, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
+$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
             FROM cardapio c
+            LEFT JOIN categoria cat ON c.categoria_id = cat.id
             LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
             LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
             WHERE $where_clause
             GROUP BY c.id";
 } else {
-    $sql = "SELECT c.*, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
+$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
             FROM cardapio c
+            LEFT JOIN categoria cat ON c.categoria_id = cat.id
             LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
             LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
             GROUP BY c.id";
@@ -133,6 +150,14 @@ $result = $conn->query($sql);
                 <input type="hidden" name="action" value="add">
                 <label>Nome: <input type="text" name="nome" required></label>
                 <label>Descrição: <input type="text" name="descricao"></label>
+                <label>Categoria: 
+                    <select name="categoria" required>
+                        <option value="">Selecione a categoria</option>
+                        <?php foreach ($categoria_list as $categoria): ?>
+                            <option value="<?= $categoria['id'] ?>"><?= htmlspecialchars($categoria['nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
                 <label>Preço: <input type="number" step="0.01" name="preco" required></label>
                 <label>Imagem (nome do arquivo): <input type="text" name="imagem"></label>
                 <fieldset>
@@ -155,6 +180,7 @@ $result = $conn->query($sql);
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Descrição</th>
+                <th>Categoria</th>
                 <th>Ingredientes</th>
                 <th>Preço</th>
                 <th>Imagem</th>
@@ -167,6 +193,7 @@ $result = $conn->query($sql);
                     <td><?= $row['id'] ?></td>
                     <td><?= $row['nome'] ?></td>
                     <td><?= $row['descricao'] ?></td>
+                    <td><?= htmlspecialchars($row['categoria_nome']) ?></td>
                     <td><?= htmlspecialchars($row['ingredientes']) ?></td>
                     <td><?= number_format($row['preco'], 2, ',', '.') ?></td>
                     <td>
@@ -194,13 +221,23 @@ $result = $conn->query($sql);
     </table>
 </div>
 
-<?php if (isset($edit_row)): ?>
+    <?php if (isset($edit_row)): ?>
     <div id="editForm" style="margin: 20px auto; width: 300px; border: 1px solid #ccc; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
         <form method="POST" action="cardapio.php">
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="id" value="<?= $edit_row['id'] ?>">
             <label>Nome: <input type="text" name="nome" value="<?= htmlspecialchars($edit_row['nome']) ?>" required></label>
             <label>Descrição: <input type="text" name="descricao" value="<?= htmlspecialchars($edit_row['descricao']) ?>"></label>
+            <label>Categoria: 
+                <select name="categoria" required>
+                    <option value="">Selecione a categoria</option>
+                    <?php foreach ($categoria_list as $categoria): ?>
+                <option value="<?= $categoria['id'] ?>" <?= (isset($edit_row['categoria_id']) && $edit_row['categoria_id'] == $categoria['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($categoria['nome']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
             <label>Preço: <input type="number" step="0.01" name="preco" value="<?= number_format($edit_row['preco'], 2, '.', '') ?>" required></label>
             <label>Imagem (nome do arquivo): <input type="text" name="imagem" value="<?= htmlspecialchars($edit_row['imagem']) ?>"></label>
             <fieldset>

@@ -1,7 +1,19 @@
 <?php
 include 'conexao.php';
 
-$query = "SELECT id, nome, descricao, preco, imagem FROM cardapio";
+// Get categories for nav bar
+$cat_query = "SELECT id, nome FROM categoria";
+$cat_result = mysqli_query($conn, $cat_query);
+
+// Get selected category id from GET parameter
+$selected_cat_id = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
+
+// Query menu items filtered by category if selected
+if ($selected_cat_id > 0) {
+    $query = "SELECT id, nome, descricao, preco, imagem FROM cardapio WHERE categoria_id = $selected_cat_id";
+} else {
+    $query = "SELECT id, nome, descricao, preco, imagem FROM cardapio";
+}
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -65,6 +77,19 @@ $result = mysqli_query($conn, $query);
     <a href="carrinho.php">Carrinho</a>
     <a href="meus_pedidos.php">Meus pedidos</a>
     <a href="sair.php" class="logout">Sair</a>
+</nav>
+
+<!-- Category nav bar -->
+<nav class="category-nav" style="margin: 20px 0; text-align: center;">
+    <?php if ($cat_result && mysqli_num_rows($cat_result) > 0): ?>
+        <?php while ($cat = mysqli_fetch_assoc($cat_result)): ?>
+            <a href="cardapio_cliente.php?categoria=<?= $cat['id'] ?>" style="margin: 0 10px; text-decoration: none; font-weight: <?= ($selected_cat_id == $cat['id']) ? 'bold' : 'normal' ?>; color: <?= ($selected_cat_id == $cat['id']) ? '#007bff' : '#000' ?>;">
+                <?= htmlspecialchars($cat['nome']) ?>
+            </a>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <p>Nenhuma categoria encontrada.</p>
+    <?php endif; ?>
 </nav>
 
     <main class="cardapio-container">
