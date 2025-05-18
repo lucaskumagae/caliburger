@@ -24,11 +24,18 @@ INSERT INTO balconista_dono (cpf, nome, data_nasc, email, sexo, senha) VALUES
 ('35265811001', 'admin', '1985-01-01', 'admin@caliburger.com', 'Masculino', '123'),
 ('54349918000', 'teste', '1995-05-05', 'teste@caliburger.com', 'Feminino', '123');
 
+CREATE TABLE categoria (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE cardapio (
   id int(11) NOT NULL,
   nome varchar(100) NOT NULL,
   descricao varchar(255) DEFAULT NULL,
-  preco decimal(10,2) DEFAULT NULL
+  preco decimal(10,2) DEFAULT NULL,
+  categoria_id INT,
+  FOREIGN KEY (categoria_id) REFERENCES categoria(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO cardapio (id, nome, descricao, preco) VALUES
@@ -51,6 +58,10 @@ INSERT INTO cardapio_ingrediente (id_cardapio, id_ingrediente, quantidade_utiliz
 (2, 1, 1),
 (2, 2, 2),
 (2, 3, 2);
+
+
+
+INSERT INTO categoria (nome) VALUES ('Lanches'), ('Acompanhamentos'), ('Bebidas');
 
 CREATE TABLE cliente (
   id int(11) NOT NULL,
@@ -321,6 +332,7 @@ SET imagem = 'x_burger.png'
 WHERE id = 3;
 
 ALTER TABLE pedido ADD COLUMN status VARCHAR(50) DEFAULT 'Concluído';
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
