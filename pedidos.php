@@ -105,6 +105,7 @@ if (count($params) > 0) {
         <input type="datetime-local" name="date_filter" id="date_filter" value="<?= isset($_GET['date_filter']) ? htmlspecialchars($_GET['date_filter']) : '' ?>">
 
         <button type="submit">Filtrar</button>
+        <a href="relatorio.php" style="padding: 8px 16px; background-color: #c0392b; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">Relatório de Vendas</a>
     </form>
     <table class="styled-table">
         <thead>
