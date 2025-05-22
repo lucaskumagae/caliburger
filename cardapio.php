@@ -31,7 +31,6 @@ if ($action === 'add') {
             $conn->query("INSERT INTO cardapio (nome, descricao, preco, imagem, categoria_id) VALUES ('$nome', '$descricao', $preco, '$imagem', $categoria_id)");
             $new_id = $conn->insert_id;
 
-            // Insert ingredients
             if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
                 foreach ($_POST['ingredientes'] as $id_ingrediente => $quantidade_utilizada) {
                     $quantidade_utilizada = intval($quantidade_utilizada);
@@ -56,14 +55,12 @@ if ($action === 'add') {
             $edit_result = $conn->query("SELECT * FROM cardapio WHERE id = $id");
             $edit_row = $edit_result->fetch_assoc();
 
-            // Fetch ingredients for this cardapio item
             $ingredientes_cardapio = [];
             $ingredientes_result = $conn->query("SELECT id_ingrediente, quantidade_utilizada FROM cardapio_ingrediente WHERE id_cardapio = $id");
             while ($row = $ingredientes_result->fetch_assoc()) {
                 $ingredientes_cardapio[$row['id_ingrediente']] = $row['quantidade_utilizada'];
             }
 
-            // Fetch categoria_id for edit form select
             if (isset($edit_row['categoria_id'])) {
                 $edit_row['categoria_id'] = intval($edit_row['categoria_id']);
             } else {
@@ -78,7 +75,7 @@ if ($action === 'add') {
             $categoria_id = intval($_POST['categoria']);
             $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem', categoria_id=$categoria_id WHERE id=$id");
 
-            // Update ingredients
+            // atualiza ingredientes
             $conn->query("DELETE FROM cardapio_ingrediente WHERE id_cardapio = $id");
             if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
                 foreach ($_POST['ingredientes'] as $id_ingrediente => $quantidade_utilizada) {
@@ -109,7 +106,8 @@ if (count($zero_ingredients) > 0) {
         $conditions[] = "c.descricao NOT LIKE '%$escaped_ingredient%'";
     }
     $where_clause = implode(' AND ', $conditions);
-$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
+$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes,
+        MIN(e.quantidade) AS min_estoque
             FROM cardapio c
             LEFT JOIN categoria cat ON c.categoria_id = cat.id
             LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
@@ -117,7 +115,8 @@ $sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente 
             WHERE $where_clause
             GROUP BY c.id";
 } else {
-$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes
+$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes,
+        MIN(e.quantidade) AS min_estoque
             FROM cardapio c
             LEFT JOIN categoria cat ON c.categoria_id = cat.id
             LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
@@ -191,7 +190,12 @@ $result = $conn->query($sql);
             <?php while($row = $result->fetch_assoc()): ?>
                 <tr>
                     <td><?= $row['id'] ?></td>
-                    <td><?= $row['nome'] ?></td>
+                    <td>
+                        <?= $row['nome'] ?>
+                        <?php if ($row['min_estoque'] !== null && $row['min_estoque'] < 30): ?>
+                            <br><span style="color: red; font-weight: bold;">Esgotado</span>
+                        <?php endif; ?>
+                    </td>
                     <td><?= $row['descricao'] ?></td>
                     <td><?= htmlspecialchars($row['categoria_nome']) ?></td>
                     <td><?= htmlspecialchars($row['ingredientes']) ?></td>

@@ -1,18 +1,26 @@
 <?php
 include 'conexao.php';
 
-// Get categories for nav bar
 $cat_query = "SELECT id, nome FROM categoria";
 $cat_result = mysqli_query($conn, $cat_query);
 
-// Get selected category id from GET parameter
 $selected_cat_id = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
 
-// Query menu items filtered by category if selected
 if ($selected_cat_id > 0) {
-    $query = "SELECT id, nome, descricao, preco, imagem FROM cardapio WHERE categoria_id = $selected_cat_id";
+    $query = "SELECT c.id, c.nome, c.descricao, c.preco, c.imagem,
+        MIN(e.quantidade) AS min_estoque
+        FROM cardapio c
+        LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
+        LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
+        WHERE c.categoria_id = $selected_cat_id
+        GROUP BY c.id";
 } else {
-    $query = "SELECT id, nome, descricao, preco, imagem FROM cardapio";
+    $query = "SELECT c.id, c.nome, c.descricao, c.preco, c.imagem,
+        MIN(e.quantidade) AS min_estoque
+        FROM cardapio c
+        LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
+        LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
+        GROUP BY c.id";
 }
 $result = mysqli_query($conn, $query);
 ?>
@@ -79,7 +87,6 @@ $result = mysqli_query($conn, $query);
     <a href="sair.php" class="logout">Sair</a>
 </nav>
 
-<!-- Category nav bar -->
 <nav class="category-nav" style="margin: 20px 0; text-align: center;">
     <?php if ($cat_result && mysqli_num_rows($cat_result) > 0): ?>
         <?php while ($cat = mysqli_fetch_assoc($cat_result)): ?>
@@ -104,7 +111,11 @@ $result = mysqli_query($conn, $query);
                             <strong>R$<?= number_format($row['preco'], 2, ',', '.') ?></strong>
                         </div>
                         <div class="item-quantidade">
-                            <input type="number" name="quantidade[<?= $row['id'] ?>]" value="0" min="0">
+                            <?php if ($row['min_estoque'] !== null && $row['min_estoque'] < 30): ?>
+                                <span style="color: red; font-weight: bold;">Esgotado</span>
+                            <?php else: ?>
+                                <input type="number" name="quantidade[<?= $row['id'] ?>]" value="0" min="0">
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endwhile; ?>
