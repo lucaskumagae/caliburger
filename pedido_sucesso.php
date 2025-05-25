@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
 
         $insert_order_stmt = $conn->prepare("INSERT INTO pedido (nome_cliente, aceito, observacao, valor, status) VALUES (?, ?, ?, ?, ?)");
         $aceito = 1;
-        $status = "Concluído";
+        $status = "Aguardando aceitação";
         $insert_order_stmt->bind_param("sisds", $nome_cliente, $aceito, $observacao_pedido, $total_pedido, $status);
         if (!$insert_order_stmt->execute()) {
             $insert_order_stmt->close();
