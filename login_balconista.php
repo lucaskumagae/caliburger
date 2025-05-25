@@ -48,6 +48,7 @@ if (isset($_SESSION['nome'])) {
           ?>
 
           <p>Login para Cliente? <a href="login.php">Clique aqui</a></p>
+          <p>Login para Cozinheiro? <a href="login_cozinheiro.php">Clique aqui</a></p>
         </form>
       </div>
     </div>

@@ -47,6 +47,7 @@ if (isset($_SESSION['nome'])) {
           }
           ?>
           <p>Login para Cliente? <a href="login.php">Clique aqui</a></p>
+          <p>Login para Balconista Dono? <a href="login_balconista.php">Clique aqui</a></p>
         </form>
       </div>
     </div>
