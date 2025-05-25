@@ -167,8 +167,6 @@ ALTER TABLE cliente
   ADD PRIMARY KEY (id),
   ADD UNIQUE KEY cpf (cpf);
 
-ALTER TABLE cozinheiro
-  ADD PRIMARY KEY (cpf);
 
 ALTER TABLE estoque
   ADD PRIMARY KEY (id_ingrediente),
