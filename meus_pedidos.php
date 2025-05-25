@@ -168,7 +168,7 @@ function mapStatus($status) {
             <option value="Aguardando aceitação" <?= (isset($_GET['status_filter']) && $_GET['status_filter'] === 'Aguardando aceitação') ? 'selected' : '' ?>>Aguardando aceitação</option>
             <option value="Cancelado/recusado" <?= (isset($_GET['status_filter']) && $_GET['status_filter'] === 'Cancelado/recusado') ? 'selected' : '' ?>>Cancelado/recusado</option>
             <option value="Em preparação" <?= (isset($_GET['status_filter']) && $_GET['status_filter'] === 'Em preparação') ? 'selected' : '' ?>>Em preparação</option>
-            <option value="Pedido a caminho" <?= (isset($_GET['status_filter']) && $_GET['status_filter'] === 'A caminho') ? 'selected' : '' ?>>A caminho</option>
+            <option value="Pedido a caminho" <?= (isset($_GET['status_filter']) && $_GET['status_filter'] === 'Pedido a caminho') ? 'selected' : '' ?>>Pedido a caminho</option>
             <option value="Concluído" <?= (isset($_GET['status_filter']) && $_GET['status_filter'] === 'Concluído') ? 'selected' : '' ?>>Concluído</option>
         </select>
 
@@ -185,7 +185,7 @@ function mapStatus($status) {
                 <th>Observação</th>
                 <th>Status</th>
                 <th>Data e Hora</th>
-                <th>Cancelar</th>
+                <th>Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -198,15 +198,23 @@ function mapStatus($status) {
                 <td><?= date('d/m/Y H:i:s', strtotime($row['data_pedido'])) ?></td>
                 <td>
                         <?php $mappedStatus = mapStatus($row['status']); ?>
+                        <!-- DEBUG: Status is [<?= htmlspecialchars($mappedStatus) ?>] -->
                         <?php if ($mappedStatus === 'Cancelado/recusado'): ?>
                             <span style="color: red;">Pedido Cancelado</span>
-                        <?php elseif ($mappedStatus !== 'Pedido a caminho' && $mappedStatus !== 'Concluído'): ?>
-                            <form method="POST" action="cancelar_pedido.php" class="cancel-form">
+                        <?php elseif ($mappedStatus === 'Pedido a caminho'): ?>
+                            <form method="POST" action="atualizar_status_pedido.php" class="received-form">
                                 <input type="hidden" name="numero_do_pedido" value="<?= $row['numero_do_pedido'] ?>">
-                                <button type="submit" class="cancel-btn">Cancelar</button>
+                                <input type="hidden" name="acao" value="concluir">
+                                <button type="submit" class="received-btn">Recebi meu pedido</button>
                             </form>
+                        <?php elseif ($mappedStatus === 'Concluído'): ?>
+                            <span>Pedido recebido</span>
                         <?php else: ?>
-                            <span style="color: red;">Só é possivel cancelar pedidos antes de saírem para entrega</span>
+                            <form method="POST" action="atualizar_status_pedido.php" class="received-form">
+                                <input type="hidden" name="numero_do_pedido" value="<?= $row['numero_do_pedido'] ?>">
+                                <input type="hidden" name="acao" value="concluir">
+                                <button type="submit" class="received-btn">Recebi meu pedido</button>
+                            </form>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -220,6 +228,14 @@ function mapStatus($status) {
         <p id="cancel-modal-message">Tem certeza que deseja cancelar este pedido?</p>
         <button id="cancel-confirm-btn">Confirmar</button>
         <button id="cancel-cancel-btn">Cancelar</button>
+    </div>
+</div>
+
+<div id="received-confirmation-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <p id="received-modal-message">Confirma que recebeu seu pedido?</p>
+        <button id="received-confirm-btn">Confirmar</button>
+        <button id="received-cancel-btn">Cancelar</button>
     </div>
 </div>
 
@@ -253,6 +269,39 @@ function mapStatus($status) {
         if (event.target === cancelModal) {
             cancelModal.style.display = 'none';
             formToSubmit = null;
+        }
+    });
+
+    // Confirmation modal for "Recebi meu pedido"
+    const receivedModal = document.getElementById('received-confirmation-modal');
+    const receivedConfirmBtn = document.getElementById('received-confirm-btn');
+    const receivedCancelBtn = document.getElementById('received-cancel-btn');
+    let receivedFormToSubmit = null;
+
+    document.querySelectorAll('.received-form').forEach(form => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            receivedFormToSubmit = form;
+            receivedModal.style.display = 'block';
+        });
+    });
+
+    receivedConfirmBtn.addEventListener('click', () => {
+        if (receivedFormToSubmit) {
+            receivedFormToSubmit.submit();
+        }
+        receivedModal.style.display = 'none';
+    });
+
+    receivedCancelBtn.addEventListener('click', () => {
+        receivedModal.style.display = 'none';
+        receivedFormToSubmit = null;
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === receivedModal) {
+            receivedModal.style.display = 'none';
+            receivedFormToSubmit = null;
         }
     });
 </script>

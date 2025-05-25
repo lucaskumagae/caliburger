@@ -8,7 +8,7 @@ if (!isset($_SESSION['nome'])) {
 }
 include 'conexao.php';
 
-$where_clauses = ["p.aceito = 1", "p.status = 'Em preparação'"];
+$where_clauses = ["p.status = 'Em preparação'"];
 $params = [];
 
 $where_sql = 'WHERE ' . implode(' AND ', $where_clauses);
@@ -93,10 +93,10 @@ $result = $stmt->get_result();
             <th>Produto</th>
             <th>Valor (R$)</th>
             <th>Cliente</th>
-            <th>Aceito</th>
             <th>Status</th>
             <th>Data e Hora</th>
             <th>Observação</th>
+            <th>Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -106,12 +106,11 @@ $result = $stmt->get_result();
                 <td><?= $row['produtos'] ?></td>
                 <td><?= number_format($row['valor'], 2, ',', '.') ?></td>
                 <td><?= htmlspecialchars($row['nome_cliente']) ?></td>
-                <td><?= $row['aceito'] ? 'Sim' : 'Não' ?></td>
                 <td><?= htmlspecialchars($row['status'] === 'Cancelado/Recusado' ? 'Cancelado/recusado' : $row['status']) ?></td>
                 <td><?= date('d/m/Y H:i:s', strtotime($row['data_pedido'])) ?></td>
                 <td><?= !empty($row['observacao']) ? $row['observacao'] : 'Ø' ?></td>
                 <td>
-                    <button class="confirmar-btn btn-confirmar" data-numero-pedido="<?= $row['numero_do_pedido'] ?>">Confirmar</button>
+                    <button class="confirmar-btn btn-confirmar" data-numero-pedido="<?= $row['numero_do_pedido'] ?>">Encaminhar pedido </button>
                 </td>
                 </tr>
             <?php endwhile; ?>

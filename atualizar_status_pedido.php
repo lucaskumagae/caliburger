@@ -18,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $novo_status = 'Cancelado/recusado';
         } elseif ($acao === 'confirmar') {
             $novo_status = 'A caminho';
+        } elseif ($acao === 'concluir') {
+            $novo_status = 'Concluído';
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'Ação inválida']);
@@ -28,7 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('si', $novo_status, $numero_do_pedido);
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'novo_status' => $novo_status]);
+            header("Location: meus_pedidos.php");
+            exit();
         } else {
             http_response_code(500);
             echo json_encode(['error' => 'Erro ao atualizar o status']);

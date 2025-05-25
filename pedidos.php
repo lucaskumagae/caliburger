@@ -132,7 +132,6 @@ if (count($params) > 0) {
                 <th>Produto</th>
                 <th>Valor (R$)</th>
                 <th>Cliente</th>
-                <th>Aceito</th>
                 <th>Status</th>
                 <th>Data e Hora</th>
                 <th>Observação</th>
@@ -145,7 +144,6 @@ if (count($params) > 0) {
                     <td><?= $row['produtos'] ?></td>
                     <td><?= number_format($row['valor'], 2, ',', '.') ?></td>
                     <td><?= htmlspecialchars($row['nome_cliente']) ?></td>
-                    <td><?= $row['aceito'] ? 'Sim' : 'Não' ?></td>
                     <td><?= htmlspecialchars($row['status'] === 'Cancelado/Recusado' ? 'Cancelado/recusado' : $row['status']) ?></td>
                     <td><?= date('d/m/Y H:i:s', strtotime($row['data_pedido'])) ?></td>
                     <td><?= !empty($row['observacao']) ? $row['observacao'] : 'Ø' ?></td>
