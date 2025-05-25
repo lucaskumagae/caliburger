@@ -377,23 +377,23 @@ SET categoria_id = 1
 WHERE id = 3;
 
 UPDATE cardapio
-SET categoria_id = 2
+SET categoria_id = 3
 WHERE id = 4;
 
 UPDATE cardapio
-SET categoria_id = 2
+SET categoria_id = 3
 WHERE id = 5;
 
 UPDATE cardapio
-SET categoria_id = 2
+SET categoria_id = 3
 WHERE id = 6;
 
 UPDATE cardapio
-SET categoria_id = 3
+SET categoria_id = 2
 WHERE id = 7;
 
 UPDATE cardapio
-SET categoria_id = 3
+SET categoria_id = 2
 WHERE id = 8;
 
 
