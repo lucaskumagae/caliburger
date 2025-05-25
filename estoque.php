@@ -59,7 +59,7 @@ if (isset($_SESSION['msg_error'])) {
                             <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
                             <button type="button" class="btn-delete" data-id="<?= $row['id_ingrediente'] ?>">Excluir</button>
                         </form>
-                        <form id="edit-form-<?= $row['id_ingrediente'] ?>" action="edita_ingrediente.php" method="GET" style="display:inline-block;">
+                        <form id="edit-form-<?= $row['id_ingrediente'] ?>" action="editar_ingrediente.php" method="GET" style="display:inline-block;">
                             <input type="hidden" name="id" value="<?= $row['id_ingrediente'] ?>">
                             <button type="submit" class="btn-edit" data-id="<?= $row['id_ingrediente'] ?>">Editar</button>
                         </form>

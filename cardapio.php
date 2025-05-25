@@ -50,44 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['message'] = "Item excluído com sucesso!";
             header("Location: cardapio.php");
             exit();
-        } elseif ($action === 'edit_form') {
-            $id = intval($_POST['id']);
-            $edit_result = $conn->query("SELECT * FROM cardapio WHERE id = $id");
-            $edit_row = $edit_result->fetch_assoc();
-
-            $ingredientes_cardapio = [];
-            $ingredientes_result = $conn->query("SELECT id_ingrediente, quantidade_utilizada FROM cardapio_ingrediente WHERE id_cardapio = $id");
-            while ($row = $ingredientes_result->fetch_assoc()) {
-                $ingredientes_cardapio[$row['id_ingrediente']] = $row['quantidade_utilizada'];
-            }
-
-            if (isset($edit_row['categoria_id'])) {
-                $edit_row['categoria_id'] = intval($edit_row['categoria_id']);
-            } else {
-                $edit_row['categoria_id'] = null;
-            }
-        } elseif ($action === 'edit') {
-            $id = intval($_POST['id']);
-            $nome = $conn->real_escape_string($_POST['nome']);
-            $descricao = $conn->real_escape_string($_POST['descricao']);
-            $preco = floatval($_POST['preco']);
-            $imagem = $conn->real_escape_string($_POST['imagem']);
-            $categoria_id = intval($_POST['categoria']);
-            $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem', categoria_id=$categoria_id WHERE id=$id");
-
-            $conn->query("DELETE FROM cardapio_ingrediente WHERE id_cardapio = $id");
-            if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
-                foreach ($_POST['ingredientes'] as $id_ingrediente => $quantidade_utilizada) {
-                    $quantidade_utilizada = intval($quantidade_utilizada);
-                    if ($quantidade_utilizada > 0) {
-                        $conn->query("INSERT INTO cardapio_ingrediente (id_cardapio, id_ingrediente, quantidade_utilizada) VALUES ($id, $id_ingrediente, $quantidade_utilizada)");
-                    }
-                }
-            }
-
-            $_SESSION['message'] = "Item atualizado com sucesso!";
-            header("Location: cardapio.php");
-            exit();
         }
     }
 }
@@ -183,10 +145,9 @@ $result = $conn->query($sql);
                         <?php endif; ?>
                     </td>
                     <td>
-                        <form method="POST" action="cardapio.php" style="display:inline;">
-                            <input type="hidden" name="action" value="edit_form">
+                        <form method="GET" action="editar_cardapio.php" style="display:inline;">
                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                            <button type="submit">Editar</button>
+                            <button type="submit" class="btn-delete" style="margin-right: 5px;">Editar</button>
                         </form>
                         <form method="POST" action="cardapio.php" style="display:inline;">
                             <input type="hidden" name="action" value="delete">
@@ -199,44 +160,6 @@ $result = $conn->query($sql);
         </tbody>
     </table>
 </div>
-
-    <?php if (isset($edit_row)): ?>
-    <div id="editForm" style="margin: 20px auto; width: 300px; border: 1px solid #ccc; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <form method="POST" action="cardapio.php">
-            <input type="hidden" name="action" value="edit">
-            <input type="hidden" name="id" value="<?= $edit_row['id'] ?>">
-            <label>Nome: <input type="text" name="nome" value="<?= htmlspecialchars($edit_row['nome']) ?>" required></label>
-            <label>Descrição: <input type="text" name="descricao" value="<?= htmlspecialchars($edit_row['descricao']) ?>"></label>
-            <label>Categoria: 
-                <select name="categoria" required>
-                    <option value="">Selecione a categoria</option>
-                    <?php foreach ($categoria_list as $categoria): ?>
-                <option value="<?= $categoria['id'] ?>" <?= (isset($edit_row['categoria_id']) && $edit_row['categoria_id'] == $categoria['id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($categoria['nome']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-            <label>Preço: <input type="number" step="0.01" name="preco" value="<?= number_format($edit_row['preco'], 2, '.', '') ?>" required></label>
-            <label>Imagem (nome do arquivo): <input type="text" name="imagem" value="<?= htmlspecialchars($edit_row['imagem']) ?>"></label>
-            <fieldset>
-                <legend>Ingredientes</legend>
-                <?php foreach ($ingredientes_list as $ingrediente): ?>
-                    <?php
-                        $id_ing = $ingrediente['id_ingrediente'];
-                        $quant = isset($ingredientes_cardapio[$id_ing]) ? $ingredientes_cardapio[$id_ing] : 0;
-                    ?>
-                    <label>
-                        <?= htmlspecialchars($ingrediente['nome_ingrediente']) ?>:
-                        <input type="number" name="ingredientes[<?= $id_ing ?>]" min="0" value="<?= $quant ?>" style="width: 60px;">
-                    </label><br>
-                <?php endforeach; ?>
-            </fieldset>
-            <button type="submit">Atualizar</button>
-            <button type="button" onclick="window.location.href='cardapio.php'">Cancelar</button>
-        </form>
-    </div>
-<?php endif; ?>
 
 <?php
 if (isset($_SESSION['message'])) {
