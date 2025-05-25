@@ -32,7 +32,7 @@ $cpf = $_POST['cpf'];
 $senha = $_POST['senha'];
 
 if (!validaCPF($cpf)) {
-    // CPF validation failed
+    // CPF nao validado
     header("Location: login_cozinheiro.php?erro=cpf");
     exit();
 }
@@ -55,7 +55,7 @@ if ($result->num_rows === 1) {
         exit();
     }
 } else {
-    // No matching CPF found
+    //CPF nao encontrado
     header("Location: login_cozinheiro.php?erro=cpf");
     exit();
 }

@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 if (!isset($_SESSION['nome'])) {
     header("Location: login_cozinheiro.php");
     exit();
@@ -50,11 +52,70 @@ $result = $stmt->get_result();
     <meta charset="UTF-8">
     <title>Pedidos Cozinheiro - Cali Burger</title>
     <link rel="stylesheet" href="main.css">
-   
+    <style>
+        .container {
+            max-width: 1200px !important;
+        }
+        input[type="datetime-local"]:not(:placeholder-shown) {
+            color: black;
+        }
+        input[type="datetime-local"]:hover,
+        input[type="datetime-local"]:focus {
+            border-color: initial;
+            outline-color: initial;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+            margin-right: 30px;
+        }
+        nav a:hover {
+            background-color: #c0392b;
+        }
+        nav .logout {
+            background-color: #ffffff22;
+            border: 1px solid white;
+        }
+        header, nav {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #c0392b;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-area img {
+            height: 60px;
+            width: auto;
+        }
+        .logo-area h1 {
+            font-size: 1.8em;
+        }
+    </style>
 </head>
 <body>
 
-<?php include 'menu.php'; ?>
+<header>
+    <div class="logo-area">
+        <img src="imagens/logo_cali_sem_fundo.png" alt="Logo Cali Burger">
+        <h1>Cali Burger</h1>
+    </div>
+</header>
+
+<nav>
+    <a href="pedidos_cozinheiro.php">Pedidos</a>
+    <a href="cardapio_cozinheiro.php">Cardápio</a>
+    <a href="sair.php" class="logout">Sair</a>
+</nav>
 
 <div class="container">
     <h2>🍔 Pedidos Aceitos</h2>  
@@ -87,6 +148,5 @@ $result = $stmt->get_result();
         </tbody>
     </table>
 </div>
-
 </body>
 </html>
