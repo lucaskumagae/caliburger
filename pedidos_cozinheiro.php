@@ -8,7 +8,7 @@ if (!isset($_SESSION['nome'])) {
 }
 include 'conexao.php';
 
-$where_clauses = ["p.aceito = 1"]; // Only accepted orders
+$where_clauses = ["p.aceito = 1"];
 $params = [];
 
 $where_sql = 'WHERE ' . implode(' AND ', $where_clauses);
