@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $novo_status = 'Em preparação';
         } elseif ($acao === 'recusar') {
             $novo_status = 'Cancelado/recusado';
+        } elseif ($acao === 'confirmar') {
+            $novo_status = 'A caminho';
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'Ação inválida']);
