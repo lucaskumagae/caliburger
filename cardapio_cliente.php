@@ -70,6 +70,23 @@ $result = mysqli_query($conn, $query);
                 border: 1px solid #ccc;
                 border-radius: 6px;
             }
+            nav.category-nav {
+                background-color: #b22222;
+                color: white;
+                margin: 0;
+                padding: 10px 0;
+                text-align: center;
+            }
+            nav.category-nav a {
+                margin: 0 10px;
+                text-decoration: none;
+                color: white;
+                font-weight: normal;
+            }
+            nav.category-nav a.selected {
+                color: black;
+                font-weight: bold;
+            }
         </style>
     </head>
 <body>
@@ -87,10 +104,10 @@ $result = mysqli_query($conn, $query);
     <a href="sair.php" class="logout">Sair</a>
 </nav>
 
-<nav class="category-nav" style="margin: 20px 0; text-align: center;">
+<nav class="category-nav">
     <?php if ($cat_result && mysqli_num_rows($cat_result) > 0): ?>
         <?php while ($cat = mysqli_fetch_assoc($cat_result)): ?>
-            <a href="cardapio_cliente.php?categoria=<?= $cat['id'] ?>" style="margin: 0 10px; text-decoration: none; font-weight: <?= ($selected_cat_id == $cat['id']) ? 'bold' : 'normal' ?>; color: <?= ($selected_cat_id == $cat['id']) ? '#007bff' : '#000' ?>;">
+            <a href="cardapio_cliente.php?categoria=<?= $cat['id'] ?>" class="<?= ($selected_cat_id == $cat['id']) ? 'selected' : '' ?>">
                 <?= htmlspecialchars($cat['nome']) ?>
             </a>
         <?php endwhile; ?>
