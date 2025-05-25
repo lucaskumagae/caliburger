@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
 
-if ($action === 'add') {
+        if ($action === 'add') {
             $nome = $conn->real_escape_string($_POST['nome']);
             $descricao = $conn->real_escape_string($_POST['descricao']);
             $preco = floatval($_POST['preco']);
@@ -66,7 +66,7 @@ if ($action === 'add') {
             } else {
                 $edit_row['categoria_id'] = null;
             }
-} elseif ($action ===    'edit') {
+        } elseif ($action === 'edit') {
             $id = intval($_POST['id']);
             $nome = $conn->real_escape_string($_POST['nome']);
             $descricao = $conn->real_escape_string($_POST['descricao']);
@@ -75,7 +75,6 @@ if ($action === 'add') {
             $categoria_id = intval($_POST['categoria']);
             $conn->query("UPDATE cardapio SET nome='$nome', descricao='$descricao', preco=$preco, imagem='$imagem', categoria_id=$categoria_id WHERE id=$id");
 
-            // atualiza ingredientes
             $conn->query("DELETE FROM cardapio_ingrediente WHERE id_cardapio = $id");
             if (isset($_POST['ingredientes']) && is_array($_POST['ingredientes'])) {
                 foreach ($_POST['ingredientes'] as $id_ingrediente => $quantidade_utilizada) {
@@ -106,22 +105,22 @@ if (count($zero_ingredients) > 0) {
         $conditions[] = "c.descricao NOT LIKE '%$escaped_ingredient%'";
     }
     $where_clause = implode(' AND ', $conditions);
-$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes,
-        MIN(e.quantidade) AS min_estoque
-            FROM cardapio c
-            LEFT JOIN categoria cat ON c.categoria_id = cat.id
-            LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
-            LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
-            WHERE $where_clause
-            GROUP BY c.id";
+    $sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes,
+            MIN(e.quantidade) AS min_estoque
+                FROM cardapio c
+                LEFT JOIN categoria cat ON c.categoria_id = cat.id
+                LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
+                LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
+                WHERE $where_clause
+                GROUP BY c.id";
 } else {
-$sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes,
-        MIN(e.quantidade) AS min_estoque
-            FROM cardapio c
-            LEFT JOIN categoria cat ON c.categoria_id = cat.id
-            LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
-            LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
-            GROUP BY c.id";
+    $sql = "SELECT c.*, cat.nome AS categoria_nome, GROUP_CONCAT(e.nome_ingrediente ORDER BY e.nome_ingrediente SEPARATOR ', ') AS ingredientes,
+            MIN(e.quantidade) AS min_estoque
+                FROM cardapio c
+                LEFT JOIN categoria cat ON c.categoria_id = cat.id
+                LEFT JOIN cardapio_ingrediente ci ON c.id = ci.id_cardapio
+                LEFT JOIN estoque e ON ci.id_ingrediente = e.id_ingrediente
+                GROUP BY c.id";
 }
 
 $result = $conn->query($sql);
@@ -135,6 +134,11 @@ $result = $conn->query($sql);
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="icon" href="imagens/logo_cali_ico.png" type="image/png">
     <link rel="icon" href="imagens/logo_cali_ico.ico" type="image/x-icon" />
+    <style>
+        .container {
+            max-width: 1200px !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -142,36 +146,7 @@ $result = $conn->query($sql);
 
 <div class="container">
     <h2>🍟 Itens do Cardápio</h2>
-    <button onclick="document.getElementById('addForm').style.display='block'">Adicionar Novo Item</button>
-
-    <div id="addForm" style="display:none; margin-bottom: 20px;">
-            <form method="POST" action="cardapio.php">
-                <input type="hidden" name="action" value="add">
-                <label>Nome: <input type="text" name="nome" required></label>
-                <label>Descrição: <input type="text" name="descricao"></label>
-                <label>Categoria: 
-                    <select name="categoria" required>
-                        <option value="">Selecione a categoria</option>
-                        <?php foreach ($categoria_list as $categoria): ?>
-                            <option value="<?= $categoria['id'] ?>"><?= htmlspecialchars($categoria['nome']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </label>
-                <label>Preço: <input type="number" step="0.01" name="preco" required></label>
-                <label>Imagem (nome do arquivo): <input type="text" name="imagem"></label>
-                <fieldset>
-                    <legend>Ingredientes</legend>
-                    <?php foreach ($ingredientes_list as $ingrediente): ?>
-                        <label>
-                            <?= htmlspecialchars($ingrediente['nome_ingrediente']) ?>:
-                            <input type="number" name="ingredientes[<?= $ingrediente['id_ingrediente'] ?>]" min="0" value="0" style="width: 60px;">
-                        </label><br>
-                    <?php endforeach; ?>
-                </fieldset>
-                <button type="submit">Salvar</button>
-                <button type="button" onclick="document.getElementById('addForm').style.display='none'">Cancelar</button>
-            </form>
-    </div>
+    <button type="submit" onclick="window.location.href='adiciona_item_cardapio.php'">Adicionar Novo Item</button>
 
     <table class="styled-table">
         <thead>
@@ -213,7 +188,7 @@ $result = $conn->query($sql);
                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
                             <button type="submit">Editar</button>
                         </form>
-                        <form method="POST" action="cardapio.php" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
+                        <form method="POST" action="cardapio.php" style="display:inline;">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
                             <button type="submit">Excluir</button>
@@ -265,7 +240,7 @@ $result = $conn->query($sql);
 
 <?php
 if (isset($_SESSION['message'])) {
-    echo "<script>alert('" . addslashes($_SESSION['message']) . "');</script>";
+    echo '<div class="message" style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin: 10px 0; border-radius: 5px;">' . htmlspecialchars($_SESSION['message']) . '</div>';
     unset($_SESSION['message']);
 }
 ?>
