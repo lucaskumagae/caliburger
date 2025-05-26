@@ -100,20 +100,26 @@ $result = $stmt->get_result();
             </tr>
         </thead>
         <tbody>
-            <?php while($row = $result->fetch_assoc()): ?>
+            <?php if ($result->num_rows === 0): ?>
                 <tr>
-                <td><?= $row['numero_do_pedido'] ?></td>
-                <td><?= $row['produtos'] ?></td>
-                <td><?= number_format($row['valor'], 2, ',', '.') ?></td>
-                <td><?= htmlspecialchars($row['nome_cliente']) ?></td>
-                <td><?= htmlspecialchars($row['status'] === 'Cancelado/Recusado' ? 'Cancelado/recusado' : $row['status']) ?></td>
-                <td><?= date('d/m/Y H:i:s', strtotime($row['data_pedido'])) ?></td>
-                <td><?= !empty($row['observacao']) ? $row['observacao'] : 'Ø' ?></td>
-                <td>
-                    <button class="confirmar-btn btn-confirmar" data-numero-pedido="<?= $row['numero_do_pedido'] ?>">Encaminhar pedido </button>
-                </td>
+                    <td colspan="8" style="text-align: center;">Não há pedidos a serem preparados</td>
                 </tr>
-            <?php endwhile; ?>
+            <?php else: ?>
+                <?php while($row = $result->fetch_assoc()): ?>
+                    <tr>
+                    <td><?= $row['numero_do_pedido'] ?></td>
+                    <td><?= $row['produtos'] ?></td>
+                    <td><?= number_format($row['valor'], 2, ',', '.') ?></td>
+                    <td><?= htmlspecialchars($row['nome_cliente']) ?></td>
+                    <td><?= htmlspecialchars($row['status'] === 'Cancelado/Recusado' ? 'Cancelado/recusado' : $row['status']) ?></td>
+                    <td><?= date('d/m/Y H:i:s', strtotime($row['data_pedido'])) ?></td>
+                    <td><?= !empty($row['observacao']) ? $row['observacao'] : 'Ø' ?></td>
+                    <td>
+                        <button class="confirmar-btn btn-confirmar" data-numero-pedido="<?= $row['numero_do_pedido'] ?>">Encaminhar pedido </button>
+                    </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php endif; ?>
         </tbody>
     </table>
 </div>
