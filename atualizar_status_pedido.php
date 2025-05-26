@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('si', $novo_status, $numero_do_pedido);
         if ($stmt->execute()) {
-            header("Location: meus_pedidos.php");
+            echo json_encode(['success' => true]);
             exit();
         } else {
             http_response_code(500);

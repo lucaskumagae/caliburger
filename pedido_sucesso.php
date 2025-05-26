@@ -72,14 +72,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_pagamento']
                 $id_ingrediente = $ingrediente['id_ingrediente'];
                 $quantidade_utilizada = $ingrediente['quantidade_utilizada'] * $quantidade;
 
-                $update_estoque_stmt = $conn->prepare("UPDATE estoque SET quantidade = quantidade - ? WHERE id_ingrediente = ? AND quantidade >= ?");
-                $update_estoque_stmt->bind_param("iii", $quantidade_utilizada, $id_ingrediente, $quantidade_utilizada);
-                $update_estoque_stmt->execute();
-                if ($update_estoque_stmt->affected_rows === 0) {
-                    $update_estoque_stmt->close();
-                    die('Estoque insuficiente para o ingrediente ID: ' . $id_ingrediente);
-                }
+            $update_estoque_stmt = $conn->prepare("UPDATE estoque SET quantidade = quantidade - ? WHERE id_ingrediente = ? AND quantidade >= ?");
+            $update_estoque_stmt->bind_param("iii", $quantidade_utilizada, $id_ingrediente, $quantidade_utilizada);
+            $update_estoque_stmt->execute();
+            if ($update_estoque_stmt->affected_rows === 0) {
                 $update_estoque_stmt->close();
+
+                // Update order status to Cancelado/recusado
+                $status_cancelado = "Cancelado/recusado";
+                $update_status_stmt = $conn->prepare("UPDATE pedido SET status = ? WHERE numero_do_pedido = ?");
+                $update_status_stmt->bind_param("si", $status_cancelado, $numero_do_pedido);
+                $update_status_stmt->execute();
+                $update_status_stmt->close();
+
+                // Clear cart session
+                unset($_SESSION['carrinho']);
+                unset($_SESSION['observacoes']);
+
+                // Show error page
+                ?>
+                <!DOCTYPE html>
+                <html lang="pt-br">
+                <head>
+                    <meta charset="UTF-8" />
+                    <title>Erro no Pedido</title>
+                    <link rel="stylesheet" href="main.css" />
+                    <style>
+                        .error-message {
+                            max-width: 400px;
+                            margin: 100px auto;
+                            padding: 40px;
+                            background-color: #fff;
+                            border-radius: 12px;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                            text-align: center;
+                            font-family: 'Poppins', sans-serif;
+                            color: #c0392b;
+                            font-size: 1.5em;
+                            font-weight: 600;
+                        }
+                        .button-voltar {
+                            display: inline-block;
+                            margin-top: 20px;
+                            padding: 10px 25px;
+                            background-color: #333333;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            text-align: center;
+                            transition: background-color 0.3s ease;
+                        }
+                        .button-voltar:hover {
+                            background-color: #555555;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <main class="error-message">
+                        Não foi possível realizar o pedido
+                        <br />
+                        <a href="carrinho.php" class="button-voltar">Voltar ao carrinho</a>
+                    </main>
+                </body>
+                </html>
+                <?php
+                exit();
+            }
+            $update_estoque_stmt->close();
             }
             $ingredientes_stmt->close();
         }

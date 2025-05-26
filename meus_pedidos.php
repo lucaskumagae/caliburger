@@ -201,6 +201,12 @@ function mapStatus($status) {
                         <!-- DEBUG: Status is [<?= htmlspecialchars($mappedStatus) ?>] -->
                         <?php if ($mappedStatus === 'Cancelado/recusado'): ?>
                             <span style="color: red;">Pedido Cancelado</span>
+                        <?php elseif ($mappedStatus === 'Aguardando aceitação' || $mappedStatus === 'Em preparação'): ?>
+                            <form method="POST" action="atualizar_status_pedido.php" class="cancel-form">
+                                <input type="hidden" name="numero_do_pedido" value="<?= $row['numero_do_pedido'] ?>">
+                                <input type="hidden" name="acao" value="recusar">
+                                <button type="submit" class="cancel-btn">Cancelar</button>
+                            </form>
                         <?php elseif ($mappedStatus === 'Pedido a caminho'): ?>
                             <form method="POST" action="atualizar_status_pedido.php" class="received-form">
                                 <input type="hidden" name="numero_do_pedido" value="<?= $row['numero_do_pedido'] ?>">
@@ -239,72 +245,89 @@ function mapStatus($status) {
     </div>
 </div>
 
-<script>
-    const cancelModal = document.getElementById('cancel-confirmation-modal');
-    const cancelConfirmBtn = document.getElementById('cancel-confirm-btn');
-    const cancelCancelBtn = document.getElementById('cancel-cancel-btn');
-    let formToSubmit = null;
+    <script>
+        const cancelModal = document.getElementById('cancel-confirmation-modal');
+        const cancelConfirmBtn = document.getElementById('cancel-confirm-btn');
+        const cancelCancelBtn = document.getElementById('cancel-cancel-btn');
+        let formToSubmit = null;
 
-    document.querySelectorAll('.cancel-form').forEach(form => {
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            formToSubmit = form;
-            cancelModal.style.display = 'block';
+        document.querySelectorAll('.cancel-form').forEach(form => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                formToSubmit = form;
+                cancelModal.style.display = 'block';
+            });
         });
-    });
 
-    cancelConfirmBtn.addEventListener('click', () => {
-        if (formToSubmit) {
-            formToSubmit.submit();
-        }
-        cancelModal.style.display = 'none';
-    });
+        cancelConfirmBtn.addEventListener('click', () => {
+            if (formToSubmit) {
+                // Submit form via AJAX
+                const formData = new FormData(formToSubmit);
+                fetch(formToSubmit.action, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload the page to reflect changes
+                        location.reload();
+                    } else {
+                        alert('Erro ao cancelar pedido: ' + (data.error || 'Erro desconhecido'));
+                    }
+                })
+                .catch(error => {
+                    alert('Erro na requisição: ' + error);
+                });
+            }
+            cancelModal.style.display = 'none';
+        });
 
-    cancelCancelBtn.addEventListener('click', () => {
-        cancelModal.style.display = 'none';
-        formToSubmit = null;
-    });
-
-    window.addEventListener('click', (event) => {
-        if (event.target === cancelModal) {
+        cancelCancelBtn.addEventListener('click', () => {
             cancelModal.style.display = 'none';
             formToSubmit = null;
-        }
-    });
-
-    // Confirmation modal for "Recebi meu pedido"
-    const receivedModal = document.getElementById('received-confirmation-modal');
-    const receivedConfirmBtn = document.getElementById('received-confirm-btn');
-    const receivedCancelBtn = document.getElementById('received-cancel-btn');
-    let receivedFormToSubmit = null;
-
-    document.querySelectorAll('.received-form').forEach(form => {
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            receivedFormToSubmit = form;
-            receivedModal.style.display = 'block';
         });
-    });
 
-    receivedConfirmBtn.addEventListener('click', () => {
-        if (receivedFormToSubmit) {
-            receivedFormToSubmit.submit();
-        }
-        receivedModal.style.display = 'none';
-    });
+        window.addEventListener('click', (event) => {
+            if (event.target === cancelModal) {
+                cancelModal.style.display = 'none';
+                formToSubmit = null;
+            }
+        });
 
-    receivedCancelBtn.addEventListener('click', () => {
-        receivedModal.style.display = 'none';
-        receivedFormToSubmit = null;
-    });
+        // Confirmation modal for "Recebi meu pedido"
+        const receivedModal = document.getElementById('received-confirmation-modal');
+        const receivedConfirmBtn = document.getElementById('received-confirm-btn');
+        const receivedCancelBtn = document.getElementById('received-cancel-btn');
+        let receivedFormToSubmit = null;
 
-    window.addEventListener('click', (event) => {
-        if (event.target === receivedModal) {
+        document.querySelectorAll('.received-form').forEach(form => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                receivedFormToSubmit = form;
+                receivedModal.style.display = 'block';
+            });
+        });
+
+        receivedConfirmBtn.addEventListener('click', () => {
+            if (receivedFormToSubmit) {
+                receivedFormToSubmit.submit();
+            }
+            receivedModal.style.display = 'none';
+        });
+
+        receivedCancelBtn.addEventListener('click', () => {
             receivedModal.style.display = 'none';
             receivedFormToSubmit = null;
-        }
-    });
-</script>
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === receivedModal) {
+                receivedModal.style.display = 'none';
+                receivedFormToSubmit = null;
+            }
+        });
+    </script>
 
 </body>
 </html>
