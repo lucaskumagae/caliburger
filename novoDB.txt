@@ -43,8 +43,8 @@ INSERT INTO cardapio (id, nome, descricao, preco) VALUES
 (2, 'Cali Duplo', 'Dois hambúrgueres 180g, cheddar duplo, pão brioche', 28.00),
 (3, 'X-Burger', 'Saboroso hambúrger com queijo carne e molho especial', 20.00),
 (4, 'Suco de uva', 'Copo de suco de uva', 8.00),
-(5, 'Refrigerante', 'Copo de crefrigerante', 8.00),
-(6, 'Agua', 'Copo de agua', 5.00),
+(5, 'Refrigerante', 'Copo de refrigerante', 8.00),
+(6, 'Água', 'Copo de agua', 5.00),
 (7, 'Cali fritas', 'Batata frita 180g', 15.00),
 (8, 'Cali nuggets', '10 nuggets', 12.00);
 
