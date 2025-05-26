@@ -311,7 +311,24 @@ function mapStatus($status) {
 
         receivedConfirmBtn.addEventListener('click', () => {
             if (receivedFormToSubmit) {
-                receivedFormToSubmit.submit();
+                // Submit form via AJAX
+                const formData = new FormData(receivedFormToSubmit);
+                fetch(receivedFormToSubmit.action, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload the page to reflect changes
+                        location.reload();
+                    } else {
+                        alert('Erro ao confirmar recebimento: ' + (data.error || 'Erro desconhecido'));
+                    }
+                })
+                .catch(error => {
+                    alert('Erro na requisição: ' + error);
+                });
             }
             receivedModal.style.display = 'none';
         });
