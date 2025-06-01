@@ -117,7 +117,7 @@ $result = mysqli_query($conn, $query);
 </nav>
 
     <main class="cardapio-container">
-        <form method="POST" action="carrinho.php">
+<form method="POST" action="carrinho.php" id="cardapioForm">
             <?php if ($result && mysqli_num_rows($result) > 0): ?>
                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
                     <div class="item-cardapio">
@@ -131,7 +131,7 @@ $result = mysqli_query($conn, $query);
                             <?php if ($row['min_estoque'] !== null && $row['min_estoque'] < 30): ?>
                                 <span style="color: red; font-weight: bold;">Esgotado</span>
                             <?php else: ?>
-                                <input type="number" name="quantidade[<?= $row['id'] ?>]" value="0" min="0">
+<input type="number" name="quantidade[<?= $row['id'] ?>]" value="0" min="0" data-item-id="<?= $row['id'] ?>">
                             <?php endif; ?>
                         </div>
                     </div>
@@ -144,6 +144,56 @@ $result = mysqli_query($conn, $query);
                 <button type="submit">Adicionar</button>
             </div>
         </form>
-    </main>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('cardapioForm');
+    const inputs = form.querySelectorAll('input[type="number"][data-item-id]');
+
+    inputs.forEach(input => {
+        const itemId = input.getAttribute('data-item-id');
+        const savedValue = localStorage.getItem('quantidade_' + itemId);
+        if (savedValue !== null) {
+            input.value = savedValue;
+        }
+    });
+
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const itemId = input.getAttribute('data-item-id');
+            localStorage.setItem('quantidade_' + itemId, input.value);
+        });
+    });
+
+    form.addEventListener('submit', () => {
+        const existingHiddenInputs = form.querySelectorAll('input[type="hidden"][name^="quantidade["]');
+        existingHiddenInputs.forEach(input => input.remove());
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('quantidade_')) {
+                const itemId = key.replace('quantidade_', '');
+                const value = localStorage.getItem(key);
+                if (value && value !== '0') {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = `quantidade[${itemId}]`;
+                    hiddenInput.value = value;
+                    form.appendChild(hiddenInput);
+                }
+            }
+        }
+
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+            if (key.startsWith('quantidade_')) {
+                localStorage.removeItem(key);
+            }
+        }
+    });
+});
+</script>
+
 </body>
 </html>
