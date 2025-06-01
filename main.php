@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $usuarios = $conn->query("SELECT * FROM balconista_dono");
+$cozinheiros = $conn->query("SELECT * FROM cozinheiro");
 ?>
 
 <!DOCTYPE html>
@@ -95,6 +96,9 @@ $usuarios = $conn->query("SELECT * FROM balconista_dono");
     <style>
         .container {
             max-width: 1200px !important;
+        }
+        h3 {
+            margin-top: 40px;
         }
     </style>
 </head>
@@ -113,13 +117,14 @@ $usuarios = $conn->query("SELECT * FROM balconista_dono");
         <input type="email" name="email" placeholder="Email" required>
         <select name="sexo" required>
             <option value="" disabled selected>Sexo</option>
-            <option value="Masculino">Masculino</option>
+            <option value="Mmasculino">Masculino</option>
             <option value="Feminino">Feminino</option>
         </select>
         <input type="password" name="senha" placeholder="Senha" required>
         <input type="password" name="confirmar_senha" placeholder="Confirmar Senha" required>
         <button type="submit">Adicionar Usuário</button>
     </form>
+    <h3>Balconistas</h3>
     <table class="styled-table">
         <thead>
             <tr>
@@ -151,6 +156,40 @@ $usuarios = $conn->query("SELECT * FROM balconista_dono");
             <?php endwhile; ?>
         </tbody>
     </table>
+
+    <h3>Cozinheiros</h3>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>CPF</th>
+                <th>Nome</th>
+                <th>Data de Nascimento</th>
+                <th>Email</th>
+                <th>Sexo</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($row = $cozinheiros->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['id'] ?></td>
+                    <td><?= $row['cpf'] ?></td>
+                    <td><?= $row['nome'] ?></td>
+                    <td><?= $row['data_nasc'] ?></td>
+                    <td><?= $row['email'] ?></td>
+                    <td><?= $row['sexo'] ?></td>
+                    <td>
+                        <form action="delete_cozinheiro.php" method="POST" onsubmit="return confirm('Deseja excluir este cozinheiro?');">
+                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                            <button type="submit">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+
     <?php echo $message; ?>
 </div>
 
