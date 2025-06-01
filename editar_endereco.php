@@ -2,14 +2,13 @@
 session_start();
 include 'conexao.php';
 
-if (!isset($_SESSION['id'])) {
+if (!isset($_SESSION['id_cliente'])) {
     header("Location: login.php");
     exit();
 }
 
-$user_id = $_SESSION['id'];
+$user_id = $_SESSION['id_cliente'];
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $end_estado = $_POST['end_estado'] ?? '';
     $end_cidade = $_POST['end_cidade'] ?? '';
@@ -27,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 } else {
-    // Load current address
     $stmt = $conn->prepare("SELECT end_estado, end_cidade, end_bairro, end_logradouro FROM cliente WHERE id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();

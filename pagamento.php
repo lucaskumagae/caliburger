@@ -9,7 +9,7 @@ include 'menu_cliente.php';
 include 'conexao.php';
 
 // Get logged-in user id from session
-$user_id = isset($_SESSION['id']) ? $_SESSION['id'] : null;
+$user_id = isset($_SESSION['id_cliente']) ? $_SESSION['id_cliente'] : null;
 
 $endereco = 'Endereço não cadastrado';
 if ($user_id) {

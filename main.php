@@ -8,7 +8,7 @@ include 'conexao.php';
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $required_fields = ['cpf', 'nome', 'data_nasc', 'email', 'sexo', 'senha'];
+    $required_fields = ['cpf', 'nome', 'data_nasc', 'email', 'sexo', 'senha', 'confirmar_senha'];
     $missing_fields = false;
     foreach ($required_fields as $field) {
         if (empty($_POST[$field])) {
@@ -20,20 +20,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($missing_fields) {
         $message = '<p style="color:red;">Por favor, preencha todos os campos obrigatórios.</p>';
     } else {
-        $cpf = $_POST['cpf'];
-        $nome = $_POST['nome'];
-        $data_nasc = $_POST['data_nasc'];
-        $email = $_POST['email'];
-        $sexo = $_POST['sexo'];
-        $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
-
-        $stmt = $conn->prepare("INSERT INTO balconista_dono (cpf, nome, data_nasc, email, sexo, senha) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $cpf, $nome, $data_nasc, $email, $sexo, $senha);
-
-        if ($stmt->execute()) {
-            $message = '<p style="color:green;">Usuário adicionado com sucesso!</p>';
+        if ($_POST['senha'] !== $_POST['confirmar_senha']) {
+            $message = '<p style="color:red;">As senhas não coincidem.</p>';
         } else {
-            $message = '<p style="color:red;">Erro ao adicionar usuário: ' . $stmt->error . '</p>';
+            $cpf = $_POST['cpf'];
+            $nome = $_POST['nome'];
+            $data_nasc = $_POST['data_nasc'];
+            $email = $_POST['email'];
+            $sexo = $_POST['sexo'];
+
+            // Validate CPF format (basic check: 11 digits)
+            function validaCPF($cpf) {
+                $cpf = preg_replace('/[^0-9]/', '', $cpf);
+                if (strlen($cpf) != 11) {
+                    return false;
+                }
+                if (preg_match('/(\d)\1{10}/', $cpf)) {
+                    return false;
+                }
+                for ($t = 9; $t < 11; $t++) {
+                    $d = 0;
+                    for ($c = 0; $c < $t; $c++) {
+                        $d += $cpf[$c] * (($t + 1) - $c);
+                    }
+                    $d = ((10 * $d) % 11) % 10;
+                    if ($cpf[$c] != $d) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            if (!validaCPF($cpf)) {
+                $message = '<p style="color:red;">CPF inválido.</p>';
+            }
+            // Validate birth date is not in the future
+            else if (strtotime($data_nasc) > time()) {
+                $message = '<p style="color:red;">Data de nascimento inválida. Não pode ser uma data futura.</p>';
+            }
+            else {
+                // Check if CPF already exists
+                $stmt_check = $conn->prepare("SELECT cpf FROM balconista_dono WHERE cpf = ?");
+                $stmt_check->bind_param("s", $cpf);
+                $stmt_check->execute();
+                $result_check = $stmt_check->get_result();
+                if ($result_check->num_rows > 0) {
+                    $message = '<p style="color:red;">CPF já cadastrado.</p>';
+                } else {
+                    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+
+                    $stmt = $conn->prepare("INSERT INTO balconista_dono (cpf, nome, data_nasc, email, sexo, senha) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param("ssssss", $cpf, $nome, $data_nasc, $email, $sexo, $senha);
+
+                    if ($stmt->execute()) {
+                        $message = '<p style="color:green;">Usuário adicionado com sucesso!</p>';
+                    } else {
+                        $message = '<p style="color:red;">Erro ao adicionar usuário: ' . $stmt->error . '</p>';
+                    }
+                }
+                $stmt_check->close();
+            }
         }
     }
 }
@@ -68,10 +113,11 @@ $usuarios = $conn->query("SELECT * FROM balconista_dono");
         <input type="email" name="email" placeholder="Email" required>
         <select name="sexo" required>
             <option value="" disabled selected>Sexo</option>
-            <option value="M">Masculino</option>
-            <option value="F">Feminino</option>
+            <option value="Mmasculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
         </select>
         <input type="password" name="senha" placeholder="Senha" required>
+        <input type="password" name="confirmar_senha" placeholder="Confirmar Senha" required>
         <button type="submit">Adicionar Usuário</button>
     </form>
     <table class="styled-table">

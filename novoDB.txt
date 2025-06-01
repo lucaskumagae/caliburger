@@ -65,7 +65,7 @@ INSERT INTO categoria (nome) VALUES ('Lanches'), ('Acompanhamentos'), ('Bebidas'
 CREATE TABLE cliente (
   id int(11) NOT NULL,
   login varchar(30) NOT NULL,
-  senha varchar(30) NOT NULL,
+  senha varchar(255) NOT NULL,
   nome varchar(100) NOT NULL,
   email varchar(255) NOT NULL,
   cpf char(11) DEFAULT NULL,

@@ -2,11 +2,11 @@
 include 'conexao.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['id'])) {
-        $id = $_POST['id'];
+if (isset($_POST['cpf'])) {
+    $cpf = $_POST['cpf'];
 
-        $stmt = $conn->prepare("DELETE FROM balconista_dono WHERE id = ?");
-        $stmt->bind_param("i", $id);
+    $stmt = $conn->prepare("DELETE FROM balconista_dono WHERE cpf = ?");
+    $stmt->bind_param("s", $cpf);
 
         if ($stmt->execute()) {
             header("Location: main.php");

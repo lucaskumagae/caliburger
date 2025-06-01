@@ -45,6 +45,7 @@ $login = $senha = $nome = $email = $cpf = $data_nasc = $estado = $cidade = $bair
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login = $_POST['login'];
     $senha = $_POST['senha'];
+    $confirmar_senha = $_POST['confirmar_senha'];
     $nome = $_POST['nome'];
     $email = $_POST['email'];
     $cpfInput = $_POST['cpf'];
@@ -70,25 +71,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $data_nasc = $dataNascInput;
     }
 
-    $login = $_POST['login'];
-    $senha = $_POST['senha'];
-    $nome = $_POST['nome'];
-    $email = $_POST['email'];
-    $estado = $_POST['estado'];
-    $cidade = $_POST['cidade'];
-    $bairro = $_POST['bairro'];
-    $logradouro = $_POST['logradouro'];
+    if ($senha !== $confirmar_senha) {
+        $error = "As senhas não coincidem.";
+    }
 
-    if ($cpfValido && $dataValida) {
-        $sql = "INSERT INTO cliente (login, senha, nome, email, cpf, data_nasc, end_estado, end_cidade, end_bairro, end_logradouro)
-                VALUES ('$login', '$senha', '$nome', '$email', '$cpf', '$data_nasc', '$estado', '$cidade', '$bairro', '$logradouro')";
-
-        if ($conn->query($sql) === TRUE) {
-            header("Location: login.php?cadastro=ok");
-            exit();
+    if ($cpfValido && $dataValida && $senha === $confirmar_senha) {
+        // Check if login or CPF already exists
+        $stmt_check = $conn->prepare("SELECT * FROM cliente WHERE login = ? OR cpf = ?");
+        $stmt_check->bind_param("ss", $login, $cpf);
+        $stmt_check->execute();
+        $result_check = $stmt_check->get_result();
+        if ($result_check->num_rows > 0) {
+            $error = "Login ou CPF já cadastrado.";
         } else {
-            $error = "Erro ao cadastrar: " . $conn->error;
+            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO cliente (login, senha, nome, email, cpf, data_nasc, end_estado, end_cidade, end_bairro, end_logradouro)
+                    VALUES ('$login', '$senha_hash', '$nome', '$email', '$cpf', '$data_nasc', '$estado', '$cidade', '$bairro', '$logradouro')";
+
+            if ($conn->query($sql) === TRUE) {
+                header("Location: login.php?cadastro=ok");
+                exit();
+            } else {
+                $error = "Erro ao cadastrar: " . $conn->error;
+            }
         }
+        $stmt_check->close();
     }
 }
 ?>
@@ -126,6 +133,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-group">
           <label for="senha">Senha</label>
           <input type="password" name="senha" id="senha" required />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmar_senha">Confirmar Senha</label>
+          <input type="password" name="confirmar_senha" id="confirmar_senha" required />
         </div>
 
         <div class="form-group">

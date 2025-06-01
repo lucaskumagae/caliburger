@@ -154,8 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             cursor: pointer;
         }
         .message {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #a93226;
+            color:rgb(255, 255, 255);
             border: 1px solid #c3e6cb;
             padding: 10px;
             margin: 10px 0;

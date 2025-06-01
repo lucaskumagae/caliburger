@@ -14,7 +14,11 @@
     <?php else: 
         $first_name = explode(' ', trim($_SESSION['nome']))[0];
     ?>
-        <a href="perfil_cliente.php">Olá, <?= htmlspecialchars($first_name) ?></a>
+        <a href="perfil_cliente.php" style="display:flex; align-items:center; gap:8px; color:white; text-decoration:none;">
+            <img src="imagens/user_icon.png" alt="User Icon" style="width:24px; height:24px;">
+            Olá, <?= htmlspecialchars($first_name) ?>
+        </a>
         <a href="sair.php" class="logout">Sair</a>
     <?php endif; ?>
 </nav>
+</create_file>
