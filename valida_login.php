@@ -13,7 +13,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
     $cliente = $result->fetch_assoc();
-    $_SESSION['id'] = $cliente['id'];
+    $_SESSION['id_cliente'] = $cliente['id'];
     $_SESSION['nome'] = $cliente['nome'];
     header("Location: cardapio_cliente.php");
 } else {

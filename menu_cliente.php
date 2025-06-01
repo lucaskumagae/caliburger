@@ -1,6 +1,3 @@
-<?php
-?>
-
 <header>
     <div class="logo-area">
         <img src="imagens/logo_cali_sem_fundo.png" alt="Logo Cali Burger">
@@ -14,7 +11,10 @@
     <a href="meus_pedidos.php">Meus pedidos</a>
     <?php if (!isset($_SESSION['nome'])): ?>
         <a href="login.php">Log-in</a>
-    <?php else: ?>
+    <?php else: 
+        $first_name = explode(' ', trim($_SESSION['nome']))[0];
+    ?>
+        <a href="perfil_cliente.php">Olá, <?= htmlspecialchars($first_name) ?></a>
         <a href="sair.php" class="logout">Sair</a>
     <?php endif; ?>
 </nav>

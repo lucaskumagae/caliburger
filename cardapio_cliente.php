@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'conexao.php';
 
 $cat_query = "SELECT id, nome FROM categoria";
@@ -90,19 +91,8 @@ $result = mysqli_query($conn, $query);
         </style>
     </head>
 <body>
-<header>
-    <div class="logo-area">
-        <img src="imagens/logo_cali_sem_fundo.png" alt="Logo Cali Burger">
-        <h1>Cali Burger</h1>
-    </div>
-</header>
 
-<nav>
-    <a href="cardapio_cliente.php">Cardápio</a>
-    <a href="carrinho.php">Carrinho</a>
-    <a href="meus_pedidos.php">Meus pedidos</a>
-    <a href="sair.php" class="logout">Sair</a>
-</nav>
+<?php include 'menu_cliente.php'; ?>
 
 <nav class="category-nav">
     <?php if ($cat_result && mysqli_num_rows($cat_result) > 0): ?>
