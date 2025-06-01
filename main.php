@@ -113,7 +113,7 @@ $usuarios = $conn->query("SELECT * FROM balconista_dono");
         <input type="email" name="email" placeholder="Email" required>
         <select name="sexo" required>
             <option value="" disabled selected>Sexo</option>
-            <option value="Mmasculino">Masculino</option>
+            <option value="Masculino">Masculino</option>
             <option value="Feminino">Feminino</option>
         </select>
         <input type="password" name="senha" placeholder="Senha" required>
