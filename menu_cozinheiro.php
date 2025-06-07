@@ -1,3 +1,9 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <header>
     <div class="logo-area">
         <img src="imagens/logo_cali_sem_fundo.png" alt="Logo Cali Burger">
@@ -47,5 +53,6 @@
 <nav>
     <a href="pedidos_cozinheiro.php">Pedidos</a>
     <a href="cardapio_cozinheiro.php">Cardápio</a>
+    <a href="perfil_cozinheiro.php">Olá, <?= isset($_SESSION['nome']) ? htmlspecialchars(explode(' ', trim($_SESSION['nome']))[0]) : 'Usuário' ?></a>
     <a href="sair.php" class="logout">Sair</a>
 </nav>

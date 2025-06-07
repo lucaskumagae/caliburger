@@ -46,9 +46,10 @@ $result = $stmt->get_result();
 if ($result->num_rows === 1) {
     $cozinheiro = $result->fetch_assoc();
     if ($cozinheiro['senha'] === $senha) {
-        $_SESSION['id'] = $cozinheiro['id'];
+        $_SESSION['cpf'] = $cozinheiro['cpf'];
         $_SESSION['nome'] = $cozinheiro['nome'];
         header("Location: pedidos_cozinheiro.php");
+
         exit();
     } else {
         header("Location: login_cozinheiro.php?erro=senha");
