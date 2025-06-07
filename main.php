@@ -173,7 +173,7 @@ $cozinheiros = $conn->query("SELECT * FROM cozinheiro");
         <tbody>
             <?php while($row = $cozinheiros->fetch_assoc()): ?>
                 <tr>
-                    <td><?= $row['id'] ?></td>
+                    <td><?= $row['cpf'] ?></td>
                     <td><?= $row['cpf'] ?></td>
                     <td><?= $row['nome'] ?></td>
                     <td><?= $row['data_nasc'] ?></td>
