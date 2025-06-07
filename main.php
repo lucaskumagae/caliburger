@@ -117,7 +117,7 @@ $cozinheiros = $conn->query("SELECT * FROM cozinheiro");
         <input type="email" name="email" placeholder="Email" required>
         <select name="sexo" required>
             <option value="" disabled selected>Sexo</option>
-            <option value="Mmasculino">Masculino</option>
+            <option value="Masculino">Masculino</option>
             <option value="Feminino">Feminino</option>
         </select>
         <input type="password" name="senha" placeholder="Senha" required>
@@ -181,7 +181,7 @@ $cozinheiros = $conn->query("SELECT * FROM cozinheiro");
                     <td><?= $row['sexo'] ?></td>
                     <td>
                         <form action="delete_cozinheiro.php" method="POST" onsubmit="return confirm('Deseja excluir este cozinheiro?');">
-                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                            <input type="hidden" name="cpf" value="<?= $row['cpf'] ?>">
                             <button type="submit">Excluir</button>
                         </form>
                     </td>
