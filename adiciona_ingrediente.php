@@ -5,14 +5,14 @@ include 'conexao.php';
 $nome = $_POST['nome_ingrediente'];
 $quantidade = $_POST['quantidade'];
 
-// Check if ingredient already exists
+// verifica se ingrediente existe
 $check_stmt = $conn->prepare("SELECT quantidade FROM estoque WHERE nome_ingrediente = ?");
 $check_stmt->bind_param("s", $nome);
 $check_stmt->execute();
 $check_stmt->store_result();
 
 if ($check_stmt->num_rows > 0) {
-    // Ingredient exists, update quantity
+    // ingrediente existe, é atualizado
     $check_stmt->bind_result($existing_quantidade);
     $check_stmt->fetch();
     $new_quantidade = $existing_quantidade + $quantidade;
@@ -26,7 +26,7 @@ if ($check_stmt->num_rows > 0) {
         $_SESSION['msg_error'] = "Erro ao atualizar quantidade: " . $update_stmt->error;
     }
 } else {
-    // Ingredient does not exist, insert new
+    // ingrediente não existe, é adicionado
     $insert_stmt = $conn->prepare("INSERT INTO estoque (nome_ingrediente, quantidade) VALUES (?, ?)");
     $insert_stmt->bind_param("si", $nome, $quantidade);
 
